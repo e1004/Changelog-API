@@ -1,0 +1,5 @@
+flask==3.*
+realerikrani-sopenqlite==1.*
+realerikrani-flaskapierr==1.*
+realerikrani-base64token==1.*
+realerikrani-project==1.*

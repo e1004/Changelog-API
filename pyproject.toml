@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "changelog-api"
+version = "1.0.0"
+description = "Manage versions and changes"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+readme = "README.md"
+license = { text = "Apache-2.0" }
+urls = { "Repository" = "https://github.com/e1004/changelog-api" }
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements/prod.in"] }
