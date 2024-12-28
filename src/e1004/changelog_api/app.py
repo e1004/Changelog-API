@@ -1,6 +1,6 @@
 from flask import Flask
-
 from realerikrani.project import register_project
+
 from e1004.changelog_api.blueprint import version
 
 

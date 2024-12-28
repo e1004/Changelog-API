@@ -1,0 +1,20 @@
+lint.select = ["ALL"]
+lint.ignore = [
+    "D104",
+    "D100",
+    "D103",
+    "D103",
+    "D211",
+    "D213",
+    "COM812",
+    "D203",
+    "ISC001"
+]
+
+lint.per-file-ignores = {"blueprint*" = [
+    "ANN201"
+], "test*" = [
+    "S101",
+    "PLR2004",
+    "ANN201"
+]}
