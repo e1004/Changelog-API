@@ -8,7 +8,8 @@ lint.ignore = [
     "D213",
     "COM812",
     "D203",
-    "ISC001"
+    "ISC001",
+    "D101"
 ]
 
 lint.per-file-ignores = {"blueprint*" = [
