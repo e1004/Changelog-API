@@ -32,7 +32,7 @@ def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
     )
 
     # when
-    response = client.post("/versions")
+    response = client.post("/versions", json={"version_number": valid_number})
 
     # then
     assert response.status_code == 201
@@ -46,3 +46,13 @@ def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
     }
     assert response.json["version"]["number"] == valid_number
     create_version.assert_called_once_with(valid_number)
+
+
+def test_it_requires_version_number(client: FlaskClient):
+    # when
+    response = client.post("/versions", json={})
+
+    # then
+    assert response.status_code == 400
+    assert response.json["errors"][0]["code"] == "VALUE_MISSING"
+    assert response.json["errors"][0]["message"] == "version number missing"

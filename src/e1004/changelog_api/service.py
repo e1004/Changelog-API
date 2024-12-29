@@ -8,7 +8,7 @@ from .model import Version
 
 def validate_version_number(number: str) -> str:
     if fullmatch(r"^\d+\.\d+\.\d+$", number) is not None:
-        return str(number)
+        return number
     raise VersionNumberInvalidError
 
 
