@@ -9,7 +9,8 @@ lint.ignore = [
     "COM812",
     "D203",
     "ISC001",
-    "D101"
+    "D101",
+    "EM101"
 ]
 
 lint.per-file-ignores = {"blueprint*" = [
@@ -19,3 +20,5 @@ lint.per-file-ignores = {"blueprint*" = [
     "PLR2004",
     "ANN201"
 ]}
+
+target-version = "py312"
