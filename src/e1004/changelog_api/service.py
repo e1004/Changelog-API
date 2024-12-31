@@ -1,7 +1,7 @@
-from datetime import UTC, datetime
 from re import fullmatch
-from uuid import uuid4
+from uuid import UUID
 
+from . import repository
 from .error import VersionNumberInvalidError
 from .model import Version
 
@@ -12,6 +12,6 @@ def validate_version_number(number: str) -> str:
     raise VersionNumberInvalidError
 
 
-def create_version(number: str) -> Version:
+def create_version(number: str, project_id: UUID) -> Version:
     valid_number = validate_version_number(number)
-    return Version(datetime.now(tz=UTC), uuid4(), valid_number, uuid4(), None)
+    return repository.create_version(valid_number, project_id)

@@ -1,13 +1,14 @@
-from datetime import UTC, datetime
 import sqlite3
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
-from realerikrani.project import Project, project_repo
 from pytest_mock import MockerFixture
+from realerikrani.project import Project, project_repo
+
 from e1004.changelog_api import repository
-from e1004.changelog_api.repository import create_version
 from e1004.changelog_api.error import ProjectNotFoundError, VersionDuplicateError
+from e1004.changelog_api.repository import create_version
 
 
 @pytest.fixture
@@ -32,6 +33,7 @@ def test_it_creates_version(project_1: Project):
     assert result.created_at == current_time
     assert result.released_at is None
 
+
 def test_it_raises_error_for_missing_project():
     # given
     version_number = "2.3.5"
@@ -40,6 +42,7 @@ def test_it_raises_error_for_missing_project():
     with pytest.raises(ProjectNotFoundError):
         # when
         create_version(version_number, uuid4())
+
 
 def test_it_creates_no_duplicate_versions(project_1: Project):
     # given
@@ -51,11 +54,12 @@ def test_it_creates_no_duplicate_versions(project_1: Project):
         # when
         create_version(version_number, project_1.id)
 
+
 def test_it_raises_unknown_integrity_error(mocker: MockerFixture):
     # given
-    mocker_error =  sqlite3.IntegrityError()
+    mocker_error = sqlite3.IntegrityError()
     mocker_error.sqlite_errorname = "UNKNOWN"
-    mocker.patch.object(repository, "_query", side_effect =mocker_error)
+    mocker.patch.object(repository, "_query", side_effect=mocker_error)
 
     # then
     with pytest.raises(sqlite3.IntegrityError):

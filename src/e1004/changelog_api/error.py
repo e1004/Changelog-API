@@ -12,10 +12,12 @@ class VersionNotFoundError(Exception):
     message: str = "version missing'"
     code: str = "RESOURCE_MISSING"
 
+
 @dataclass(slots=True)
 class ProjectNotFoundError(Exception):
     message: str = "project missing'"
     code: str = "RESOURCE_MISSING"
+
 
 @dataclass(slots=True)
 class VersionDuplicateError(Exception):

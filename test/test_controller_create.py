@@ -1,14 +1,18 @@
 from datetime import UTC, datetime
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 from pytest_mock import MockerFixture
+from realerikrani.project import PublicKey, bearer_extractor
 
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
 from e1004.changelog_api.model import Version
+
+_KEY = Mock(autospec=PublicKey)
 
 
 @pytest.fixture
@@ -21,6 +25,11 @@ def app() -> Flask:
 @pytest.fixture
 def client(app: Flask) -> FlaskClient:
     return app.test_client()
+
+
+@pytest.fixture(autouse=True)
+def protect(mocker: MockerFixture):
+    mocker.patch.object(bearer_extractor, "protect", return_value=_KEY)
 
 
 def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
@@ -45,7 +54,7 @@ def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
         "released_at",
     }
     assert response.json["version"]["number"] == valid_number
-    create_version.assert_called_once_with(valid_number)
+    create_version.assert_called_once_with(valid_number, _KEY.project_id)
 
 
 def test_it_requires_version_number(client: FlaskClient):

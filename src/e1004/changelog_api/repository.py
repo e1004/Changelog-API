@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 from realerikrani.sopenqlite import query
 
 from .db import CREATE_TABLES
-from .error import VersionNotFoundError, ProjectNotFoundError, VersionDuplicateError
+from .error import ProjectNotFoundError, VersionDuplicateError, VersionNotFoundError
 from .model import Version
 
 _query = partial(
@@ -48,6 +48,6 @@ def create_version(version: str, project_id: UUID) -> Version:
     except sqlite3.IntegrityError as integrity:
         if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE":
             raise VersionDuplicateError from None
-        elif integrity.sqlite_errorname == "SQLITE_CONSTRAINT_FOREIGNKEY":
+        if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_FOREIGNKEY":
             raise ProjectNotFoundError from None
         raise
