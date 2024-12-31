@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS version (
     ),
     created_at INTEGER NOT NULL,
     released_at INTEGER,
-    FOREIGN KEY(project_id) REFERENCES project(id) ON DELETE CASCADE
-    PRIMARY KEY(id) ON CONFLICT FAIL
+    FOREIGN KEY(project_id) REFERENCES project(id) ON DELETE CASCADE,
+    PRIMARY KEY(id) ON CONFLICT FAIL,
     UNIQUE(project_id, major, minor, patch)
 ) WITHOUT ROWID;
 """

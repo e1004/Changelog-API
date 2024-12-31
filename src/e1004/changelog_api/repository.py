@@ -7,14 +7,14 @@ from uuid import UUID, uuid4
 from realerikrani.sopenqlite import query
 
 from .db import CREATE_TABLES
-from .error import VersionNotFoundError
+from .error import VersionNotFoundError, ProjectNotFoundError, VersionDuplicateError
 from .model import Version
 
 _query = partial(
     query,
     CREATE_TABLES,
     os.environ["PROJECT_DATABASE_PATH"],
-    [],
+    ["PRAGMA foreign_keys = 1"],
 )
 
 
@@ -43,4 +43,11 @@ def create_version(version: str, project_id: UUID) -> Version:
     )
     args = str(project_id), *map(int, version.split(".")), str(uuid4()), time
 
-    return to_version(_query(lambda c: c.execute(q, args).fetchone()))
+    try:
+        return to_version(_query(lambda c: c.execute(q, args).fetchone()))
+    except sqlite3.IntegrityError as integrity:
+        if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE":
+            raise VersionDuplicateError from None
+        elif integrity.sqlite_errorname == "SQLITE_CONSTRAINT_FOREIGNKEY":
+            raise ProjectNotFoundError from None
+        raise
