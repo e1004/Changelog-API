@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import date
 from unittest.mock import Mock
 from uuid import uuid4
 
@@ -35,7 +35,7 @@ def protect(mocker: MockerFixture):
 def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
     # given
     valid_number = "1.0.0"
-    version = Version(datetime.now(tz=UTC), uuid4(), valid_number, uuid4(), None)
+    version = Version(date.today(), uuid4(), valid_number, uuid4(), None)
     create_version = mocker.patch.object(
         service, "create_version", return_value=version
     )
@@ -54,6 +54,7 @@ def test_it_creates_version(client: FlaskClient, mocker: MockerFixture):
         "released_at",
     }
     assert response.json["version"]["number"] == valid_number
+    assert response.json["version"]["created_at"] == version.created_at.isoformat()
     create_version.assert_called_once_with(valid_number, _KEY.project_id)
 
 
