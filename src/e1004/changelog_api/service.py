@@ -12,8 +12,8 @@ def validate_version_number(number: str) -> str:
     raise VersionNumberInvalidError
 
 
-def create_version(number: str, project_id: UUID) -> Version:
-    valid_number = validate_version_number(number)
+def create_version(version_number: str, project_id: UUID) -> Version:
+    valid_number = validate_version_number(version_number)
     return repository.create_version(valid_number, project_id)
 
 

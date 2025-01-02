@@ -40,13 +40,13 @@ def to_version(row: sqlite3.Row | None) -> Version:
     )
 
 
-def create_version(version: str, project_id: UUID) -> Version:
+def create_version(version_number: str, project_id: UUID) -> Version:
     q = """INSERT INTO version(project_id, major, minor, patch, id, created_at)
     VALUES (?,?,?,?,?,?) RETURNING *"""
     time = (
         datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
     )
-    args = str(project_id), *map(int, version.split(".")), str(uuid4()), time
+    args = str(project_id), *map(int, version_number.split(".")), str(uuid4()), time
 
     try:
         return to_version(_query(lambda c: c.execute(q, args).fetchone()))
