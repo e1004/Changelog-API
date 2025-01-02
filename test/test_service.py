@@ -27,7 +27,7 @@ def test_it_returns_valid_version_number():
     assert result == number
 
 
-def test_it_creates_version_calls_repository(mocker: MockerFixture):
+def test_creates_version_calls_repository(mocker: MockerFixture):
     # given
     create_version = mocker.patch.object(repository, "create_version")
     number = "1.2.3"
@@ -39,3 +39,17 @@ def test_it_creates_version_calls_repository(mocker: MockerFixture):
     # then
     create_version.assert_called_once_with(number, project_id)
     assert result == create_version.return_value
+
+
+def test_delete_version_calls_repository(mocker: MockerFixture):
+    # given
+    delete_version = mocker.patch.object(repository, "delete_version")
+    number = "1.2.3"
+    project_id = uuid4()
+
+    # when
+    result = service.delete_version(number, project_id)
+
+    # then
+    delete_version.assert_called_once_with(number, project_id)
+    assert result == delete_version.return_value

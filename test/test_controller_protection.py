@@ -18,5 +18,8 @@ def client(app: Flask) -> FlaskClient:
 
 
 def test_it_requires_auth(client: FlaskClient):
-    response = client.post("/versions", json={})
-    assert response.status_code == 401
+    result = {
+        client.post("/versions", json={}).status_code,
+        client.delete("/versions/1.2.3").status_code,
+    }
+    assert result == {401}

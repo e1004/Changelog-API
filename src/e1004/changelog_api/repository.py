@@ -7,7 +7,12 @@ from uuid import UUID, uuid4
 from realerikrani.sopenqlite import query
 
 from .db import CREATE_TABLES
-from .error import ProjectNotFoundError, VersionDuplicateError, VersionNotFoundError
+from .error import (
+    ProjectNotFoundError,
+    VersionCannotBeDeletedError,
+    VersionDuplicateError,
+    VersionNotFoundError,
+)
 from .model import Version
 
 _query = partial(
@@ -51,3 +56,17 @@ def create_version(version: str, project_id: UUID) -> Version:
         if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_FOREIGNKEY":
             raise ProjectNotFoundError from None
         raise
+
+
+def delete_version(version_number: str, project_id: UUID) -> Version:
+    check_query = """SELECT * FROM version WHERE project_id = ?
+    AND major = ? AND minor = ? AND patch = ? AND released_at IS NOT NULL"""
+    check_args = (str(project_id), *map(int, version_number.split(".")))
+
+    if _query(lambda c: c.execute(check_query, check_args).fetchone()) is not None:
+        raise VersionCannotBeDeletedError from None
+
+    delete_query = """DELETE FROM version WHERE project_id = ?
+    AND major = ? AND minor = ? AND patch = ? AND released_at IS NULL RETURNING *"""
+
+    return to_version(_query(lambda c: c.execute(delete_query, check_args).fetchone()))

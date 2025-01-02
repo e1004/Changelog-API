@@ -15,3 +15,8 @@ def validate_version_number(number: str) -> str:
 def create_version(number: str, project_id: UUID) -> Version:
     valid_number = validate_version_number(number)
     return repository.create_version(valid_number, project_id)
+
+
+def delete_version(version_number: str, project_id: UUID) -> Version:
+    valid_number = validate_version_number(version_number)
+    return repository.delete_version(valid_number, project_id)
