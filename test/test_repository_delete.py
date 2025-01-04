@@ -1,10 +1,15 @@
+from datetime import date
 from uuid import uuid4
 
 import pytest
 from realerikrani.project import Project, project_repo
 
-from e1004.changelog_api.error import VersionNotFoundError
-from e1004.changelog_api.repository import create_version, delete_version
+from e1004.changelog_api.error import VersionCannotBeDeletedError, VersionNotFoundError
+from e1004.changelog_api.repository import (
+    create_version,
+    delete_version,
+    release_version,
+)
 
 
 @pytest.fixture
@@ -34,3 +39,15 @@ def test_it_raises_error_for_missing_version():
     with pytest.raises(VersionNotFoundError):
         # when
         delete_version(version_number, uuid4())
+
+
+def test_it_raises_error_for_released_version(project_1: Project):
+    # given
+    version_number = "2.3.5"
+    create_version(version_number, project_1.id)
+    release_version(version_number, project_1.id, date.today())
+
+    # then
+    with pytest.raises(VersionCannotBeDeletedError):
+        # when
+        delete_version(version_number, project_1.id)

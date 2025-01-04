@@ -5,8 +5,10 @@ from realerikrani.project import bearer_extractor
 from . import service
 from .error import (
     VersionCannotBeDeletedError,
+    VersionCannotBeReleasedError,
     VersionNotFoundError,
     VersionNumberInvalidError,
+    VersionReleasedAtError,
 )
 
 version = Blueprint("version_controller", __name__)
@@ -43,4 +45,30 @@ def delete_version(version_number: str):
         raise ErrorGroup("400", [Error(cbd.message, cbd.code)]) from None
     except VersionNotFoundError as nf:
         raise ErrorGroup("404", [Error(nf.message, nf.code)]) from None
+    return {"version": version}
+
+
+def to_released_at(req: dict) -> str:
+    try:
+        return str(req["released_at"])
+    except KeyError:
+        raise ErrorGroup(
+            "400", [Error("released at missing", "VALUE_MISSING")]
+        ) from None
+
+
+@version.route("/<version_number>", methods=["PATCH"])
+def release_version(version_number: str):
+    key = bearer_extractor.protect()
+    released_at = to_released_at(dict(request.json))  # type: ignore[arg-type]
+    try:
+        version = service.release_version(version_number, key.project_id, released_at)
+    except VersionNumberInvalidError as invalid:
+        raise ErrorGroup("400", [Error(invalid.message, invalid.code)]) from None
+    except VersionNotFoundError as nf:
+        raise ErrorGroup("404", [Error(nf.message, nf.code)]) from None
+    except VersionCannotBeReleasedError as br:
+        raise ErrorGroup("400", [Error(br.message, br.code)]) from None
+    except VersionReleasedAtError as ra:
+        raise ErrorGroup("400", [Error(ra.message, ra.code)]) from None
     return {"version": version}

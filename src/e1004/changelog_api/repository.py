@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from functools import partial
 from uuid import UUID, uuid4
 
@@ -10,6 +10,7 @@ from .db import CREATE_TABLES
 from .error import (
     ProjectNotFoundError,
     VersionCannotBeDeletedError,
+    VersionCannotBeReleasedError,
     VersionDuplicateError,
     VersionNotFoundError,
 )
@@ -70,3 +71,27 @@ def delete_version(version_number: str, project_id: UUID) -> Version:
     AND major = ? AND minor = ? AND patch = ? AND released_at IS NULL RETURNING *"""
 
     return to_version(_query(lambda c: c.execute(delete_query, check_args).fetchone()))
+
+
+def release_version(
+    version_number: str, project_id: UUID, released_at: date
+) -> Version:
+    check_query = """SELECT * FROM version WHERE project_id = ?
+    AND major = ? AND minor = ? AND patch = ? AND released_at IS NOT NULL"""
+    check_args = (str(project_id), *map(int, version_number.split(".")))
+
+    if _query(lambda c: c.execute(check_query, check_args).fetchone()) is not None:
+        raise VersionCannotBeReleasedError from None
+
+    update_query = """UPDATE version SET released_at = ? WHERE project_id = ?
+    AND major = ? AND minor = ? AND patch = ? AND released_at IS NULL RETURNING *"""
+    released_timestamp = datetime.combine(
+        released_at, datetime.min.time(), UTC
+    ).timestamp()
+    return to_version(
+        _query(
+            lambda c: c.execute(
+                update_query, (released_timestamp, *check_args)
+            ).fetchone()
+        )
+    )

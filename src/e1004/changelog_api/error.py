@@ -26,6 +26,20 @@ class VersionDuplicateError(Exception):
 
 
 @dataclass(slots=True)
-class VersionCannotBeDeletedError(Exception):
+class VersionReleasedError(Exception):
     message: str = "version is released"
     code: str = "RESOURCE_PERMANENT"
+
+
+@dataclass(slots=True)
+class VersionCannotBeDeletedError(VersionReleasedError): ...
+
+
+@dataclass(slots=True)
+class VersionCannotBeReleasedError(VersionReleasedError): ...
+
+
+@dataclass(slots=True)
+class VersionReleasedAtError(Exception):
+    message: str = "invalid released at"
+    code: str = "VALUE_INVALID"
