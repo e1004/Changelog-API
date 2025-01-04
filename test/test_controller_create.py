@@ -66,3 +66,16 @@ def test_it_requires_version_number(client: FlaskClient):
     assert response.status_code == 400
     assert response.json["errors"][0]["code"] == "VALUE_MISSING"
     assert response.json["errors"][0]["message"] == "version number missing"
+
+
+def test_it_requires_valid_version_number(client: FlaskClient):
+    # when
+    response = client.post("/versions", json={"version_number": ""})
+
+    # then
+    assert response.status_code == 400
+    assert response.json["errors"][0]["code"] == "VALUE_INVALID"
+    assert (
+        response.json["errors"][0]["message"]
+        == "version number must use integers in 'major.minor.patch'"
+    )

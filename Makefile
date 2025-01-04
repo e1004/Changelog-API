@@ -13,7 +13,7 @@ install:
 .PHONY: test
 test:
 	python3 -m pip install -e .
-	PROJECT_DATABASE_PATH=./database.sqlite python3 -m pytest
+	PROJECT_DATABASE_PATH=./database.sqlite python3 -m pytest --cov=src --cov-report=term-missing
 
 .PHONY: lint
 lint:
