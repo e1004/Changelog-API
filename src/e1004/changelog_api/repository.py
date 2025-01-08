@@ -95,3 +95,52 @@ def release_version(
             ).fetchone()
         )
     )
+
+
+def read_versions(project_id: UUID, page_size: int) -> list[Version]:
+    q = """SELECT * FROM version WHERE project_id = ?
+    ORDER BY major DESC, minor DESC, patch DESC LIMIT ?"""
+    args = str(project_id), page_size
+    return [to_version(v) for v in _query(lambda c: c.execute(q, args).fetchall())]
+
+
+def read_prev_versions(
+    project_id: UUID, page_size: int, last_version: str
+) -> list[Version]:
+    q = """SELECT * FROM version WHERE project_id = :project_id AND(
+    (major=:major AND minor=:minor AND patch>:patch) OR
+    (major=:major AND minor>:minor) OR
+    (major>:major)
+    )
+    ORDER BY major ASC, minor ASC, patch ASC LIMIT :limit"""
+    major, minor, patch = map(int, last_version.split("."))
+    params = {
+        "project_id": str(project_id),
+        "major": major,
+        "minor": minor,
+        "patch": patch,
+        "limit": page_size,
+    }
+    return [to_version(v) for v in _query(lambda c: c.execute(q, params).fetchall())][
+        ::-1
+    ]
+
+
+def read_next_versions(
+    project_id: UUID, page_size: int, last_version: str
+) -> list[Version]:
+    q = """SELECT * FROM version WHERE project_id = :project_id AND(
+    (major=:major AND minor=:minor AND patch<:patch) OR
+    (major=:major AND minor<:minor) OR
+    (major<:major)
+    )
+    ORDER BY major DESC, minor DESC, patch DESC LIMIT :limit"""
+    major, minor, patch = map(int, last_version.split("."))
+    params = {
+        "project_id": str(project_id),
+        "major": major,
+        "minor": minor,
+        "patch": patch,
+        "limit": page_size,
+    }
+    return [to_version(v) for v in _query(lambda c: c.execute(q, params).fetchall())]

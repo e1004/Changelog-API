@@ -43,3 +43,9 @@ class VersionCannotBeReleasedError(VersionReleasedError): ...
 class VersionReleasedAtError(Exception):
     message: str = "invalid released at"
     code: str = "VALUE_INVALID"
+
+
+@dataclass(slots=True)
+class VersionsReadingTokenInvalidError(Exception):
+    message: str = "versions reading token invalid"
+    code: str = "VALUE_INVALID"
