@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Changelog API</title>
+    </head>
+    <body>
+        <form method="POST">
+            <input type="hidden" name="previous" value="{{ previous_token}}">
+            <button type="submit" name="load_previous" {% if previous_token is none %}disabled{% endif %}>Load previous</button>
+        </form>
+        <form method="POST">
+            <input type="hidden" name="next" value="{{ next_token}}">
+            <button type="submit" name="load_next" {% if next_token is none %}disabled{% endif %}>Load next</button>
+        </form>
+
+        <div>
+            {% for v in versions %}
+            <div>
+                <a href="">{{ v.number }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>
