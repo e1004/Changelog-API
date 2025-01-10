@@ -4,7 +4,9 @@ from flask import Blueprint, render_template, request
 
 from e1004.changelog_api import service
 
-ui = Blueprint("ui_controller", __name__, template_folder="templates")
+ui = Blueprint(
+    "ui_controller", __name__, template_folder="templates", static_folder="assets"
+)
 
 
 @ui.route("/<uuid:project_id>", methods=["GET", "POST"])

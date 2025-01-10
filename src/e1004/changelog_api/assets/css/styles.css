@@ -1,0 +1,74 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+button {
+    background: linear-gradient(135deg, #3d5a80, #293241);
+    color: #eaeaea;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:disabled {
+    background: #444;
+    color: #777;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #98c1d9, #3d5a80);
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: #98c1d9;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #e0fbfc;
+}
+
+div {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+div > div {
+    background-color: #293241;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+div > div:hover {
+    transform: translateY(-5px);
+    background-color: #3d5a80;
+}
+
+input[type="hidden"] {
+    display: none;
+}
