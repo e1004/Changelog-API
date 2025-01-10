@@ -20,7 +20,8 @@ lint.per-file-ignores = {"blueprint*" = [
     "S101",
     "PLR2004",
     "ANN201",
-    "DTZ011"
+    "DTZ011",
+    "S105"
 ]}
 
 target-version = "py312"
