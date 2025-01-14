@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from flask import Blueprint, request
 from realerikrani.flaskapierr import Error, ErrorGroup
 from realerikrani.project import bearer_extractor
@@ -85,3 +87,19 @@ def read_versions():
         "previous_token": version_page.prev_token,
         "next_token": version_page.next_token,
     }
+
+
+@version.route("/<version_number>/changes", methods=["POST"])
+def create_change(version_number: str): ...
+
+
+@version.route("/<version_number>/changes/<uuid:id>", methods=["DELETE"])
+def delete_change(version_number: str, id: UUID): ...
+
+
+@version.route("/<version_number>/changes", methods=["GET"])
+def read_changes_for_version(version_number: str): ...
+
+
+@version.route("/<version_number>/changes/<uuid:id>", methods=["PATCH"])
+def move_change_to_other_version(version_number: str, id: UUID): ...
