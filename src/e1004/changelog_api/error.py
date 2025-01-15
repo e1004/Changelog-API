@@ -14,6 +14,12 @@ class VersionNotFoundError(Exception):
 
 
 @dataclass(slots=True)
+class ChangeNotFoundError(Exception):
+    message: str = "change missing"
+    code: str = "RESOURCE_MISSING"
+
+
+@dataclass(slots=True)
 class ProjectNotFoundError(Exception):
     message: str = "project missing"
     code: str = "RESOURCE_MISSING"
@@ -22,6 +28,12 @@ class ProjectNotFoundError(Exception):
 @dataclass(slots=True)
 class VersionDuplicateError(Exception):
     message: str = "version duplicate"
+    code: str = "RESOURCE_EXISTING"
+
+
+@dataclass(slots=True)
+class ChangeDuplicateError(Exception):
+    message: str = "change duplicate"
     code: str = "RESOURCE_EXISTING"
 
 

@@ -7,8 +7,12 @@ from pytest_mock import MockerFixture
 from realerikrani.project import Project, project_repo
 
 from e1004.changelog_api import repository
-from e1004.changelog_api.error import ProjectNotFoundError, VersionDuplicateError
-from e1004.changelog_api.repository import create_version
+from e1004.changelog_api.error import (
+    ProjectNotFoundError,
+    VersionDuplicateError,
+    VersionNotFoundError,
+)
+from e1004.changelog_api.repository import create_change, create_version
 
 
 @pytest.fixture
@@ -65,3 +69,28 @@ def test_it_raises_unknown_integrity_error(mocker: MockerFixture):
     with pytest.raises(sqlite3.IntegrityError):
         # when
         repository.create_version("1.2.3", uuid4())
+
+
+def test_it_creates_change(project_1: Project):
+    # given
+    version_number = "2.3.5"
+    version = create_version(version_number, project_1.id)
+    kind = "added"
+    body = "aaaa"
+
+    # when
+    result = create_change(version_number, project_1.id, kind, body)
+
+    # then
+    assert result.version_id == version.id
+    assert result.kind == kind
+    assert result.body == body
+    assert isinstance(result.id, UUID)
+    assert isinstance(result.version_id, UUID)
+
+
+def test_it_creates_no_change_for_missing_version():
+    # then
+    with pytest.raises(VersionNotFoundError):
+        # when
+        create_change("2.0.9", uuid4(), "fixed", "body")

@@ -8,13 +8,15 @@ from realerikrani.sopenqlite import query
 
 from .db import CREATE_TABLES
 from .error import (
+    ChangeDuplicateError,
+    ChangeNotFoundError,
     ProjectNotFoundError,
     VersionCannotBeDeletedError,
     VersionCannotBeReleasedError,
     VersionDuplicateError,
     VersionNotFoundError,
 )
-from .model import Version
+from .model import Change, Version
 
 _query = partial(
     query,
@@ -38,6 +40,17 @@ def to_version(row: sqlite3.Row | None) -> Version:
             if row["released_at"] is not None
             else None
         ),
+    )
+
+
+def to_change(row: sqlite3.Row | None) -> Change:
+    if row is None:
+        raise ChangeNotFoundError
+    return Change(
+        id=UUID(row["id"]),
+        version_id=UUID(row["version_id"]),
+        kind=row["kind"],
+        body=row["body"],
     )
 
 
@@ -144,3 +157,28 @@ def read_next_versions(
         "limit": page_size,
     }
     return [to_version(v) for v in _query(lambda c: c.execute(q, params).fetchall())]
+
+
+def create_change(
+    version_number: str, project_id: UUID, kind: str, body: str
+) -> Change:
+    q = """INSERT INTO change(id, version_id, body, kind)
+    SELECT ?, id, ?, ? FROM version
+    WHERE project_id=? AND major=? AND minor=? AND patch=?
+    RETURNING *"""
+    args = (
+        str(uuid4()),
+        body,
+        kind,
+        str(project_id),
+        *map(int, version_number.split(".")),
+    )
+
+    try:
+        return to_change(_query(lambda c: c.execute(q, args).fetchone()))
+    except sqlite3.IntegrityError as integrity:
+        if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE":
+            raise ChangeDuplicateError from None
+        raise
+    except ChangeNotFoundError:
+        raise VersionNotFoundError from None
