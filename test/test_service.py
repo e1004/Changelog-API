@@ -251,3 +251,21 @@ def test_it_reads_versions_with_previous_direction(mocker: MockerFixture):
         [("version_number", _VERSION_2.number), ("direction", "previous")]
     )
     assert result.versions == [_VERSION_2]
+
+
+@pytest.mark.parametrize(
+    "kind", ["added", "changed", "fixed", "removed", "deprecated", "security"]
+)
+@pytest.mark.parametrize("body", ["a", "a" * 1000, "aaaaaa"])
+def test_it_creates_change(mocker: MockerFixture, kind: str, body: str):
+    # given
+    create_change = mocker.patch.object(repository, "create_change")
+    version_number = "1.2.3"
+    project_id = uuid4()
+
+    # when
+    result = service.create_change(version_number, project_id, kind, body)
+
+    # then
+    assert result == create_change.return_value
+    create_change.assert_called_once_with(version_number, project_id, kind, body)

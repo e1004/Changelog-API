@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS change (
     ),
     body TEXT NOT NULL CHECK(
         length("body") <= 1000
+        AND length("body") >= 1
     ),
     kind TEXT NOT NULL CHECK(
         "kind" in (

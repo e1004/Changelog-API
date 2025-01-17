@@ -7,11 +7,12 @@ from realerikrani.base64token import decode, encode
 
 from . import repository
 from .error import (
+    ChangeKindInvalidError,
     VersionNumberInvalidError,
     VersionReleasedAtError,
     VersionsReadingTokenInvalidError,
 )
-from .model import Version, VersionsPage
+from .model import Change, Version, VersionsPage
 
 
 def validate_version_number(number: str) -> str:
@@ -96,3 +97,24 @@ def read_versions(project_id: UUID, page_size: int, token: str | None) -> Versio
                 ("direction", "previous"),
             ]
     return VersionsPage(versions, encode(prev_token), encode(next_token))
+
+
+def validate_kind(kind: str) -> str:
+    if kind in ["added", "changed", "deprecated", "removed", "fixed", "security"]:
+        return kind
+    raise ChangeKindInvalidError
+
+
+def validate_body(body: str) -> str:
+    if 1 <= len(body) <= 1000:
+        return body
+    raise ChangeKindInvalidError
+
+
+def create_change(
+    version_number: str, project_id: UUID, kind: str, body: str
+) -> Change:
+    valid_number = validate_version_number(version_number)
+    valid_kind = validate_kind(kind)
+    valid_body = validate_body(body)
+    return repository.create_change(valid_number, project_id, valid_kind, valid_body)

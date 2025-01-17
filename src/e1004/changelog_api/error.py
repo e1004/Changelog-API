@@ -55,3 +55,18 @@ class VersionReleasedAtError(Exception):
 class VersionsReadingTokenInvalidError(Exception):
     message: str = "versions reading token invalid"
     code: str = "VALUE_INVALID"
+
+
+@dataclass(slots=True)
+class ChangeKindInvalidError(Exception):
+    message: str = (
+        "invalid kind: must be one of "
+        '"added","changed","deprecated","removed","fixed","security"'
+    )
+    code: str = "VALUE_INVALID"
+
+
+@dataclass(slots=True)
+class ChangeBodyInvalidError(Exception):
+    message: str = "change body is longer that 1000 characters"
+    code: str = "VALUE_INVALID"
