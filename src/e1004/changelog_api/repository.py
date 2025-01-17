@@ -8,7 +8,6 @@ from realerikrani.sopenqlite import query
 
 from .db import CREATE_TABLES
 from .error import (
-    ChangeDuplicateError,
     ChangeNotFoundError,
     ProjectNotFoundError,
     VersionCannotBeDeletedError,
@@ -176,9 +175,5 @@ def create_change(
 
     try:
         return to_change(_query(lambda c: c.execute(q, args).fetchone()))
-    except sqlite3.IntegrityError as integrity:
-        if integrity.sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE":
-            raise ChangeDuplicateError from None
-        raise
     except ChangeNotFoundError:
         raise VersionNotFoundError from None

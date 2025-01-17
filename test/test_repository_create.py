@@ -71,11 +71,13 @@ def test_it_raises_unknown_integrity_error(mocker: MockerFixture):
         repository.create_version("1.2.3", uuid4())
 
 
-def test_it_creates_change(project_1: Project):
+@pytest.mark.parametrize(
+    "kind", ["added", "changed", "fixed", "removed", "deprecated", "security"]
+)
+def test_it_creates_change(project_1: Project, kind: str):
     # given
     version_number = "2.3.5"
     version = create_version(version_number, project_1.id)
-    kind = "added"
     body = "aaaa"
 
     # when

@@ -32,12 +32,6 @@ class VersionDuplicateError(Exception):
 
 
 @dataclass(slots=True)
-class ChangeDuplicateError(Exception):
-    message: str = "change duplicate"
-    code: str = "RESOURCE_EXISTING"
-
-
-@dataclass(slots=True)
 class VersionReleasedError(Exception):
     message: str = "version is released"
     code: str = "RESOURCE_PERMANENT"
