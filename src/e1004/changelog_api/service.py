@@ -7,6 +7,7 @@ from realerikrani.base64token import decode, encode
 
 from . import repository
 from .error import (
+    ChangeBodyInvalidError,
     ChangeKindInvalidError,
     VersionNumberInvalidError,
     VersionReleasedAtError,
@@ -108,7 +109,7 @@ def validate_kind(kind: str) -> str:
 def validate_body(body: str) -> str:
     if 1 <= len(body) <= 1000:
         return body
-    raise ChangeKindInvalidError
+    raise ChangeBodyInvalidError
 
 
 def create_change(
