@@ -10,7 +10,7 @@ from realerikrani.project import PublicKey, bearer_extractor
 
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
-from e1004.changelog_api.model import Version
+from e1004.changelog_api.model import Change, Version
 
 _KEY = Mock(autospec=PublicKey)
 
@@ -79,3 +79,37 @@ def test_it_requires_valid_version_number(client: FlaskClient):
         response.json["errors"][0]["message"]
         == "version number must use integers in 'major.minor.patch'"
     )
+
+
+def test_create_change_requires_kind_and_body(client: FlaskClient):
+    # when
+    response = client.post("/versions/1.2.4/changes", json={})
+
+    # then
+    assert response.status_code == 400
+    assert len(response.json["errors"]) == 2
+    assert response.json["errors"][0]["code"] == "VALUE_MISSING"
+    assert response.json["errors"][1]["code"] == "VALUE_MISSING"
+    assert "kind" in response.json["errors"][0]["message"]
+    assert "body" in response.json["errors"][1]["message"]
+
+
+def test_it_creates_change(client: FlaskClient, mocker: MockerFixture):
+    # given
+    change = Change(uuid4(), "1.2.3", "aaa", "changed")
+    create_change = mocker.patch.object(service, "create_change", return_value=change)
+
+    # when
+    response = client.post(
+        "/versions/1.2.3/changes", json={"kind": change.kind, "body": change.body}
+    )
+
+    # then
+    assert response.status_code == 201
+    create_change.assert_called_once_with(
+        "1.2.3", _KEY.project_id, change.kind, change.body
+    )
+    assert set(response.json.keys()) == {"change"}
+    assert set(response.json["change"].keys()) == {"version_id", "id", "kind", "body"}
+    assert response.json["change"]["kind"] == change.kind
+    assert response.json["change"]["body"] == change.body

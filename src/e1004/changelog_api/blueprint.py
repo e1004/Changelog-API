@@ -89,8 +89,40 @@ def read_versions():
     }
 
 
+def to_kind(req: dict) -> str:
+    try:
+        return str(req["kind"])
+    except KeyError:
+        raise Error("kind missing", "VALUE_MISSING") from None
+
+
+def to_body(req: dict) -> str:
+    try:
+        return str(req["body"])
+    except KeyError:
+        raise Error("body missing", "VALUE_MISSING") from None
+
+
 @version.route("/<version_number>/changes", methods=["POST"])
-def create_change(version_number: str): ...
+def create_change(version_number: str):
+    key = bearer_extractor.protect()
+    payload = dict(request.json)  # type: ignore[arg-type]
+    errors = []
+    try:
+        kind = to_kind(payload)
+    except Error as e:
+        errors.append(e)
+
+    try:
+        body = to_body(payload)
+    except Error as e:
+        errors.append(e)
+
+    if errors:
+        raise ErrorGroup("400", errors)
+
+    change = service.create_change(version_number, key.project_id, kind, body)
+    return {"change": change}, 201
 
 
 @version.route("/<version_number>/changes/<uuid:id>", methods=["DELETE"])
