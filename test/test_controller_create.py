@@ -10,6 +10,11 @@ from realerikrani.project import PublicKey, bearer_extractor
 
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
+from e1004.changelog_api.error import (
+    ChangeBodyInvalidError,
+    ChangeKindInvalidError,
+    VersionNumberInvalidError,
+)
 from e1004.changelog_api.model import Change, Version
 
 _KEY = Mock(autospec=PublicKey)
@@ -113,3 +118,23 @@ def test_it_creates_change(client: FlaskClient, mocker: MockerFixture):
     assert set(response.json["change"].keys()) == {"version_id", "id", "kind", "body"}
     assert response.json["change"]["kind"] == change.kind
     assert response.json["change"]["body"] == change.body
+
+
+@pytest.mark.parametrize(
+    "error", [ChangeKindInvalidError, ChangeBodyInvalidError, VersionNumberInvalidError]
+)
+def test_it_creates_no_change_for_invalid_input(
+    client: FlaskClient, mocker: MockerFixture, error: Exception
+):
+    # given
+    mocker.patch.object(service, "create_change", side_effect=error)
+
+    # when
+    response = client.post(
+        "/versions/1.2.3/changes", json={"kind": "security", "body": "change"}
+    )
+
+    # then
+    assert response.status_code == 400
+    assert set(response.json.keys()) == {"errors"}
+    assert len(response.json["errors"]) == 1

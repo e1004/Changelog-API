@@ -6,6 +6,8 @@ from realerikrani.project import bearer_extractor
 
 from . import service
 from .error import (
+    ChangeBodyInvalidError,
+    ChangeKindInvalidError,
     VersionCannotBeDeletedError,
     VersionCannotBeReleasedError,
     VersionNotFoundError,
@@ -121,7 +123,14 @@ def create_change(version_number: str):
     if errors:
         raise ErrorGroup("400", errors)
 
-    change = service.create_change(version_number, key.project_id, kind, body)
+    try:
+        change = service.create_change(version_number, key.project_id, kind, body)
+    except (
+        ChangeKindInvalidError,
+        ChangeBodyInvalidError,
+        VersionNumberInvalidError,
+    ) as e:
+        raise ErrorGroup("400", [Error(e.message, e.code)]) from None
     return {"change": change}, 201
 
 
