@@ -177,3 +177,13 @@ def create_change(
         return to_change(_query(lambda c: c.execute(q, args).fetchone()))
     except ChangeNotFoundError:
         raise VersionNotFoundError from None
+
+
+def delete_change(version_number: str, id: UUID, project_id: UUID) -> Change:
+    q = """DELETE FROM change
+    WHERE id=? AND version_id=(
+    SELECT id FROM version
+    WHERE project_id=? AND major=? AND minor=? AND patch=? AND released_at is NULL
+    ) RETURNING *"""
+    args = str(id), str(project_id), *map(int, version_number.split("."))
+    return to_change(_query(lambda c: c.execute(q, args).fetchone()))
