@@ -14,6 +14,7 @@ from .error import (
     VersionCannotBeReleasedError,
     VersionDuplicateError,
     VersionNotFoundError,
+    VersionReleasedError,
 )
 from .model import Change, Version
 
@@ -180,10 +181,18 @@ def create_change(
 
 
 def delete_change(version_number: str, id: UUID, project_id: UUID) -> Change:
-    q = """DELETE FROM change
+    qv = "SELECT * FROM version WHERE project_id=? AND major=? AND minor=? AND patch=?"
+    qc = """DELETE FROM change
     WHERE id=? AND version_id=(
     SELECT id FROM version
     WHERE project_id=? AND major=? AND minor=? AND patch=? AND released_at is NULL
     ) RETURNING *"""
-    args = str(id), str(project_id), *map(int, version_number.split("."))
-    return to_change(_query(lambda c: c.execute(q, args).fetchone()))
+    args_v = str(project_id), *map(int, version_number.split("."))
+    args_c = str(id), str(project_id), *map(int, version_number.split("."))
+    _qv = lambda c: c.execute(qv, args_v).fetchone()
+    _qc = lambda c: c.execute(qc, args_c).fetchone()
+    version, change = _query(lambda c: (_qv(c), _qc(c)))
+    v = to_version(version)
+    if v.released_at:
+        raise VersionReleasedError
+    return to_change(change)

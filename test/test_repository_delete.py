@@ -5,7 +5,6 @@ import pytest
 from realerikrani.project import Project, project_repo
 
 from e1004.changelog_api.error import (
-    ChangeNotFoundError,
     VersionCannotBeDeletedError,
     VersionNotFoundError,
 )
@@ -73,6 +72,6 @@ def test_it_deletes_change(project_1: Project):
 
 
 def test_deleting_change_raises_error_for_missing_change():
-    with pytest.raises(ChangeNotFoundError):
+    with pytest.raises(VersionNotFoundError):
         # when
         delete_change("2.3.5", uuid4(), uuid4())
