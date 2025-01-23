@@ -8,11 +8,13 @@ from . import service
 from .error import (
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
+    ChangeNotFoundError,
     VersionCannotBeDeletedError,
     VersionCannotBeReleasedError,
     VersionNotFoundError,
     VersionNumberInvalidError,
     VersionReleasedAtError,
+    VersionReleasedError,
 )
 
 version = Blueprint("version_controller", __name__)
@@ -134,8 +136,16 @@ def create_change(version_number: str):
     return {"change": change}, 201
 
 
-@version.route("/<version_number>/changes/<uuid:id>", methods=["DELETE"])
-def delete_change(version_number: str, id: UUID): ...
+@version.route("/<version_number>/changes/<uuid:change_id>", methods=["DELETE"])
+def delete_change(version_number: str, change_id: UUID):
+    key = bearer_extractor.protect()
+    try:
+        change = service.delete_change(version_number, change_id, key.project_id)
+    except (VersionNumberInvalidError, VersionReleasedError) as v:
+        raise ErrorGroup("400", [Error(v.message, v.code)]) from None
+    except (VersionNotFoundError, ChangeNotFoundError) as n:
+        raise ErrorGroup("404", [Error(n.message, n.code)]) from None
+    return {"change": change}, 200
 
 
 @version.route("/<version_number>/changes", methods=["GET"])
