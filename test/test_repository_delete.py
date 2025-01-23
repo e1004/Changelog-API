@@ -7,6 +7,7 @@ from realerikrani.project import Project, project_repo
 from e1004.changelog_api.error import (
     VersionCannotBeDeletedError,
     VersionNotFoundError,
+    VersionReleasedError,
 )
 from e1004.changelog_api.repository import (
     create_change,
@@ -75,3 +76,15 @@ def test_deleting_change_raises_error_for_missing_change():
     with pytest.raises(VersionNotFoundError):
         # when
         delete_change("2.3.5", uuid4(), uuid4())
+
+
+def test_deleting_change_raises_error_for_released_version(project_1: Project):
+    # given
+    version_number = "2.3.5"
+    create_version(version_number, project_1.id)
+    change = create_change(version_number, project_1.id, "added", "aaaa")
+    release_version(version_number, project_1.id, date.today())
+
+    with pytest.raises(VersionReleasedError):
+        # when
+        delete_change(version_number, change.id, project_1.id)
