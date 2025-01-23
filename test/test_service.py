@@ -282,3 +282,23 @@ def test_create_change_raises_error_for_invalid_kind():
 def test_create_change_raises_error_for_invalid_body(body: str):
     with pytest.raises(ChangeBodyInvalidError):
         service.create_change("1.2.3", uuid4(), "added", body)
+
+
+def test_it_deletes_change(mocker: MockerFixture):
+    # given
+    delete_change = mocker.patch.object(repository, "delete_change")
+    version_number = "1.2.3"
+    project_id = uuid4()
+    change_id = uuid4()
+
+    # when
+    result = service.delete_change(version_number, change_id, project_id)
+
+    # then
+    assert result == delete_change.return_value
+    delete_change.assert_called_once_with(version_number, change_id, project_id)
+
+
+def test_delete_change_raises_error_for_invalid_version_number():
+    with pytest.raises(VersionNumberInvalidError):
+        service.delete_change("1.2", uuid4(), uuid4())

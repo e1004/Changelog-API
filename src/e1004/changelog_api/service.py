@@ -119,3 +119,8 @@ def create_change(
     valid_kind = validate_kind(kind)
     valid_body = validate_body(body)
     return repository.create_change(valid_number, project_id, valid_kind, valid_body)
+
+
+def delete_change(version_number: str, change_id: UUID, project_id: UUID) -> Change:
+    valid_number = validate_version_number(version_number)
+    return repository.delete_change(valid_number, change_id, project_id)
