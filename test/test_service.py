@@ -14,12 +14,13 @@ from e1004.changelog_api.error import (
     VersionReleasedAtError,
     VersionsReadingTokenInvalidError,
 )
-from e1004.changelog_api.model import Version
+from e1004.changelog_api.model import Change, Version
 from e1004.changelog_api.service import validate_released_at, validate_version_number
 
 _VERSION_1 = Mock(autospec=Version, number="1.0.1")
 _VERSION_2 = Mock(autospec=Version, number="2.0.1")
 _VERSION_3 = Mock(autospec=Version)
+_CHANGE_1 = Mock(autospec=Change, kind="added", body="body")
 
 
 def test_it_raises_error_for_invalid_version_number():
@@ -302,3 +303,24 @@ def test_it_deletes_change(mocker: MockerFixture):
 def test_delete_change_raises_error_for_invalid_version_number():
     with pytest.raises(VersionNumberInvalidError):
         service.delete_change("1.2", uuid4(), uuid4())
+
+
+def test_it_reads_change(mocker: MockerFixture):
+    # given
+    version_number = "1.2.3"
+    project_id = uuid4()
+    reader = mocker.patch.object(
+        repository, "read_changes_for_version", return_value=[_CHANGE_1]
+    )
+
+    # when
+    result = service.read_changes_for_version(version_number, project_id)
+
+    # then
+    assert result == [_CHANGE_1]
+    reader.assert_called_once_with(version_number, project_id)
+
+
+def test_reading_version_changes_raises_error_for_invalid_version_number():
+    with pytest.raises(VersionNumberInvalidError):
+        service.read_changes_for_version("1.2", uuid4())

@@ -124,3 +124,8 @@ def create_change(
 def delete_change(version_number: str, change_id: UUID, project_id: UUID) -> Change:
     valid_number = validate_version_number(version_number)
     return repository.delete_change(valid_number, change_id, project_id)
+
+
+def read_changes_for_version(version_number: str, project_id: UUID) -> list[Change]:
+    valid_number = validate_version_number(version_number)
+    return repository.read_changes_for_version(valid_number, project_id)

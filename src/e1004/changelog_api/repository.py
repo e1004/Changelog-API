@@ -196,3 +196,19 @@ def delete_change(version_number: str, id: UUID, project_id: UUID) -> Change:
     if v.released_at:
         raise VersionReleasedError
     return to_change(change)
+
+
+def read_changes_for_version(version_number: str, project_id: UUID) -> list[Change]:
+    version_query = """SELECT id FROM version WHERE project_id = ?
+                       AND major = ? AND minor = ? AND patch = ?"""
+    version_args = (str(project_id), *map(int, version_number.split(".")))
+    version_id_row = _query(lambda c: c.execute(version_query, version_args).fetchone())
+    if version_id_row is None:
+        raise VersionNotFoundError
+    version_id = version_id_row[0]
+    change_query = """SELECT * FROM change WHERE version_id=? ORDER BY kind ASC"""
+    change_args = (version_id,)
+    return [
+        to_change(h)
+        for h in _query(lambda c: c.execute(change_query, change_args).fetchall())
+    ]
