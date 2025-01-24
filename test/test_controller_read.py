@@ -10,7 +10,8 @@ from realerikrani.project import PublicKey, bearer_extractor
 
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
-from e1004.changelog_api.model import Version, VersionsPage
+from e1004.changelog_api.error import VersionNotFoundError, VersionNumberInvalidError
+from e1004.changelog_api.model import Change, Version, VersionsPage
 
 _KEY = Mock(autospec=PublicKey)
 
@@ -64,7 +65,7 @@ def test_it_reads_versions_without_request_params(
     read_versions.assert_called_once_with(_KEY.project_id, 5, None)
 
 
-def test_it_reads_versions_wit_request_params(
+def test_it_reads_versions_with_request_params(
     client: FlaskClient, mocker: MockerFixture
 ):
     # given
@@ -82,3 +83,48 @@ def test_it_reads_versions_wit_request_params(
     assert response.json["previous_token"] is None
     assert response.json["next_token"] is None
     read_versions.assert_called_once_with(_KEY.project_id, page_size, token)
+
+
+def test_it_reads_changes_for_version(client: FlaskClient, mocker: MockerFixture):
+    # given
+    valid_number = "1.0.0"
+    change_1 = Change(uuid4(), uuid4(), "body", "fixed")
+    change_2 = Change(uuid4(), uuid4(), "body", "security")
+    read_changes = mocker.patch.object(
+        service, "read_changes_for_version", return_value=[change_1, change_2]
+    )
+
+    # when
+    response = client.get(f"/versions/{valid_number}/changes")
+
+    # then
+    assert response.status_code == 200
+    assert set(response.json.keys()) == {"changes"}
+    assert set(response.json["changes"][0].keys()) == {
+        "id",
+        "version_id",
+        "kind",
+        "body",
+    }
+    read_changes.assert_called_once_with(valid_number, _KEY.project_id)
+
+
+@pytest.mark.parametrize(
+    ("error", "error_code"),
+    [
+        (VersionNotFoundError, 404),
+        (VersionNumberInvalidError, 400),
+    ],
+)
+def test_it_returns_error_for_invalid_changes_reading(
+    client: FlaskClient, mocker: MockerFixture, error: Exception, error_code: int
+):
+    # given
+    valid_number = "1.0.0"
+    mocker.patch.object(service, "read_changes_for_version", side_effect=error)
+
+    # when
+    response = client.get(f"/versions/{valid_number}/changes")
+
+    # then
+    assert response.status_code == error_code

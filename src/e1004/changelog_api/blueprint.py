@@ -145,11 +145,19 @@ def delete_change(version_number: str, change_id: UUID):
         raise ErrorGroup("400", [Error(v.message, v.code)]) from None
     except (VersionNotFoundError, ChangeNotFoundError) as n:
         raise ErrorGroup("404", [Error(n.message, n.code)]) from None
-    return {"change": change}, 200
+    return {"change": change}
 
 
 @version.route("/<version_number>/changes", methods=["GET"])
-def read_changes_for_version(version_number: str): ...
+def read_changes_for_version(version_number: str):
+    key = bearer_extractor.protect()
+    try:
+        changes = service.read_changes_for_version(version_number, key.project_id)
+    except VersionNumberInvalidError as n:
+        raise ErrorGroup("400", [Error(n.message, n.code)]) from None
+    except VersionNotFoundError as v:
+        raise ErrorGroup("404", [Error(v.message, v.code)]) from None
+    return {"changes": changes}
 
 
 @version.route("/<version_number>/changes/<uuid:id>", methods=["PATCH"])
