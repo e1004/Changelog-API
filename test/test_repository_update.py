@@ -4,8 +4,17 @@ from uuid import uuid4
 import pytest
 from realerikrani.project import Project, project_repo
 
-from e1004.changelog_api.error import VersionCannotBeReleasedError, VersionNotFoundError
-from e1004.changelog_api.repository import create_version, release_version
+from e1004.changelog_api.error import (
+    VersionCannotBeReleasedError,
+    VersionNotFoundError,
+    VersionReleasedError,
+)
+from e1004.changelog_api.repository import (
+    create_change,
+    create_version,
+    move_change_to_other_version,
+    release_version,
+)
 
 
 @pytest.fixture
@@ -49,3 +58,55 @@ def test_it_has_already_released_version(project_1: Project):
     with pytest.raises(VersionCannotBeReleasedError):
         # when
         release_version(version_number, project_1.id, released_date)
+
+
+def test_it_moves_change_to_other_version(project_1: Project):
+    # given
+    version_number_1 = "1.3.5"
+    create_version(version_number_1, project_1.id)
+    version_number_2 = "2.3.5"
+    target_version = create_version(version_number_2, project_1.id)
+    change = create_change(version_number_1, project_1.id, "added", "body")
+
+    # when
+    result = move_change_to_other_version(
+        version_number_1, version_number_2, project_1.id, change.id
+    )
+
+    # then
+    assert result.version_id == target_version.id
+    assert result.id == change.id
+
+
+def test_it_moves_no_change_to_released_version(project_1: Project):
+    # given
+    version_number_1 = "1.3.5"
+    create_version(version_number_1, project_1.id)
+    version_number_2 = "2.3.5"
+    create_version(version_number_2, project_1.id)
+    release_version(version_number_2, project_1.id, date.today())
+    change = create_change(version_number_1, project_1.id, "added", "body")
+
+    # then
+    with pytest.raises(VersionReleasedError):
+        # when
+        move_change_to_other_version(
+            version_number_1, version_number_2, project_1.id, change.id
+        )
+
+
+def test_it_moves_no_released_version_change_to_other_version(project_1: Project):
+    # given
+    version_number_1 = "1.3.5"
+    create_version(version_number_1, project_1.id)
+    version_number_2 = "2.3.5"
+    create_version(version_number_2, project_1.id)
+    release_version(version_number_1, project_1.id, date.today())
+    change = create_change(version_number_1, project_1.id, "added", "body")
+
+    # then
+    with pytest.raises(VersionReleasedError):
+        # when
+        move_change_to_other_version(
+            version_number_1, version_number_2, project_1.id, change.id
+        )

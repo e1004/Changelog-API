@@ -212,3 +212,41 @@ def read_changes_for_version(version_number: str, project_id: UUID) -> list[Chan
         to_change(h)
         for h in _query(lambda c: c.execute(change_query, change_args).fetchall())
     ]
+
+
+def move_change_to_other_version(
+    from_version_number: str, to_version_number: str, project_id: UUID, change_id: UUID
+) -> Change:
+    qv = "SELECT * FROM version WHERE project_id=? AND major=? AND minor=? AND patch=?"
+    qc = """UPDATE change SET version_id=(
+    SELECT id FROM version WHERE project_id=:project_id AND
+    major=:to_major AND minor=:to_minor AND patch=:to_patch
+    AND released_at is NULL)
+    WHERE id=:change_id AND version_id=(
+    SELECT id FROM version
+    WHERE project_id=:project_id AND major=:from_major AND
+    minor=:from_minor AND patch=:from_patch AND released_at is NULL
+    ) RETURNING *"""
+    args_v1 = str(project_id), *map(int, from_version_number.split("."))
+    args_v2 = str(project_id), *map(int, to_version_number.split("."))
+    args_c = {
+        "project_id": str(project_id),
+        "change_id": str(change_id),
+        "to_major": args_v2[1],
+        "to_minor": args_v2[2],
+        "to_patch": args_v2[3],
+        "from_major": args_v1[1],
+        "from_minor": args_v1[2],
+        "from_patch": args_v1[3],
+    }
+    _qv1 = lambda c: c.execute(qv, args_v1).fetchone()
+    _qc = lambda c: c.execute(qc, args_c).fetchone()
+
+    try:
+        from_version, change = _query(lambda c: (_qv1(c), _qc(c)))
+    except sqlite3.IntegrityError as e:
+        raise VersionReleasedError from e
+    fv = to_version(from_version)
+    if fv.released_at:
+        raise VersionReleasedError
+    return to_change(change)

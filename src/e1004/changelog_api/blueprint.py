@@ -160,5 +160,5 @@ def read_changes_for_version(version_number: str):
     return {"changes": changes}
 
 
-@version.route("/<version_number>/changes/<uuid:id>", methods=["PATCH"])
-def move_change_to_other_version(version_number: str, id: UUID): ...
+@version.route("/<version_number>/changes/<uuid:change_id>", methods=["PATCH"])
+def move_change_to_other_version(version_number: str, change_id: UUID): ...
