@@ -160,5 +160,26 @@ def read_changes_for_version(version_number: str):
     return {"changes": changes}
 
 
+def to_target_version_number(req: dict) -> str:
+    try:
+        return str(req["version_number"])
+    except KeyError:
+        raise ErrorGroup(
+            "400", [Error("version number missing", "VALUE_MISSING")]
+        ) from None
+
+
 @version.route("/<version_number>/changes/<uuid:change_id>", methods=["PATCH"])
-def move_change_to_other_version(version_number: str, change_id: UUID): ...
+def move_change_to_other_version(version_number: str, change_id: UUID):
+    key = bearer_extractor.protect()
+    payload = dict(request.json)  # type: ignore[arg-type]
+    target_version_number = to_target_version_number(payload)
+    try:
+        change = service.move_change_to_other_version(
+            version_number, target_version_number, key.project_id, change_id
+        )
+    except (VersionNumberInvalidError, VersionReleasedError) as nr:
+        raise ErrorGroup("400", [Error(nr.message, nr.code)]) from None
+    except (VersionNotFoundError, ChangeNotFoundError) as nt:
+        raise ErrorGroup("404", [Error(nt.message, nt.code)]) from None
+    return {"change": change}

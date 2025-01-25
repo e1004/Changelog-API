@@ -11,10 +11,13 @@ from realerikrani.project import PublicKey, bearer_extractor
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
 from e1004.changelog_api.error import (
+    ChangeNotFoundError,
     VersionCannotBeReleasedError,
     VersionNotFoundError,
+    VersionNumberInvalidError,
+    VersionReleasedError,
 )
-from e1004.changelog_api.model import Version
+from e1004.changelog_api.model import Change, Version
 
 _KEY = Mock(autospec=PublicKey)
 
@@ -130,3 +133,68 @@ def test_it_requires_released_at(client: FlaskClient):
     assert response.status_code == 400
     assert response.json["errors"][0]["code"] == "VALUE_MISSING"
     assert response.json["errors"][0]["message"] == "released at missing"
+
+
+def test_it_moves_change_to_other_version(client: FlaskClient, mocker: MockerFixture):
+    # given
+    version_number_1 = "1.0.0"
+    version_number_2 = "2.0.0"
+    change = Change(uuid4(), uuid4(), "body", "fixed")
+    move_change = mocker.patch.object(
+        service, "move_change_to_other_version", return_value=change
+    )
+
+    # when
+    response = client.patch(
+        f"/versions/{version_number_1}/changes/{change.id}",
+        json={"version_number": version_number_2},
+    )
+
+    # then
+    assert response.status_code == 200
+    assert set(response.json.keys()) == {"change"}
+    assert set(response.json["change"].keys()) == {
+        "id",
+        "version_id",
+        "kind",
+        "body",
+    }
+    move_change.assert_called_once_with(
+        version_number_1, version_number_2, _KEY.project_id, change.id
+    )
+
+
+def test_moving_change_requires_target_version_number(client: FlaskClient):
+    # when
+    response = client.patch(f"/versions/1.2.3/changes/{uuid4()}", json={"": ""})
+
+    # then
+    assert response.status_code == 400
+    assert response.json["errors"][0]["code"] == "VALUE_MISSING"
+    assert response.json["errors"][0]["message"] == "version number missing"
+
+
+@pytest.mark.parametrize(
+    ("error", "error_code"),
+    [
+        (VersionNotFoundError, 404),
+        (VersionReleasedError, 400),
+        (ChangeNotFoundError, 404),
+        (VersionNumberInvalidError, 400),
+    ],
+)
+def test_it_returns_error_for_invalid_change_moving(
+    client: FlaskClient, mocker: MockerFixture, error: Exception, error_code: int
+):
+    # given
+    valid_number = "1.0.0"
+    mocker.patch.object(service, "move_change_to_other_version", side_effect=error)
+
+    # when
+    response = client.patch(
+        f"/versions/{valid_number}/changes/{uuid4()}",
+        json={"version_number": valid_number},
+    )
+
+    # then
+    assert response.status_code == error_code
