@@ -129,3 +129,13 @@ def delete_change(version_number: str, change_id: UUID, project_id: UUID) -> Cha
 def read_changes_for_version(version_number: str, project_id: UUID) -> list[Change]:
     valid_number = validate_version_number(version_number)
     return repository.read_changes_for_version(valid_number, project_id)
+
+
+def move_change_to_other_version(
+    from_version_number: str, to_version_number: str, project_id: UUID, change_id: UUID
+) -> Change:
+    valid_from = validate_version_number(from_version_number)
+    valid_to = validate_version_number(to_version_number)
+    return repository.move_change_to_other_version(
+        valid_from, valid_to, project_id, change_id
+    )

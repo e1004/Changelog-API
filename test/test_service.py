@@ -324,3 +324,31 @@ def test_it_reads_change(mocker: MockerFixture):
 def test_reading_version_changes_raises_error_for_invalid_version_number():
     with pytest.raises(VersionNumberInvalidError):
         service.read_changes_for_version("1.2", uuid4())
+
+
+def test_it_moves_change_to_other_version(mocker: MockerFixture):
+    # given
+    version_number_1 = "1.2.3"
+    version_number_2 = "2.2.3"
+    project_id = uuid4()
+    change_id = uuid4()
+    mover = mocker.patch.object(
+        repository, "move_change_to_other_version", return_value=[_CHANGE_1]
+    )
+
+    # when
+    result = service.move_change_to_other_version(
+        version_number_1, version_number_2, project_id, change_id
+    )
+
+    # then
+    assert result == [_CHANGE_1]
+    mover.assert_called_once_with(
+        version_number_1, version_number_2, project_id, change_id
+    )
+
+
+@pytest.mark.parametrize(("from_v", "to_v"), [("1.1.1", ""), ("", "2.2.2")])
+def test_move_change_to_other_version_raises_error(from_v: str, to_v: str):
+    with pytest.raises(VersionNumberInvalidError):
+        service.move_change_to_other_version(from_v, to_v, uuid4(), uuid4())
