@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Changes</title>
+        <link rel="stylesheet" href="{{ url_for('ui_controller.static', filename='css/styles.css') }}">
+    </head>
+    <body>
+        <div>
+            {% for c in changes %}
+            <div>
+                <p>{{c.kind}}</p>
+                <p>{{c.body}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>
