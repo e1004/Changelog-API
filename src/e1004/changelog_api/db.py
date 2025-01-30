@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS version (
     UNIQUE(project_id, major, minor, patch)
 ) WITHOUT ROWID;
 
+CREATE INDEX idx_version_project_id_major_minor_patch_desc
+ON version (project_id, major DESC, minor DESC, patch DESC);
+
+CREATE INDEX idx_version_project_id_major_minor_patch_asc
+ON version (project_id, major ASC, minor ASC, patch ASC);
+
 CREATE TABLE IF NOT EXISTS change (
     id TEXT NOT NULL CHECK(
         length("id") = 36
@@ -40,4 +46,10 @@ CREATE TABLE IF NOT EXISTS change (
     FOREIGN KEY(version_id) REFERENCES version(id) ON DELETE CASCADE,
     PRIMARY KEY(id) ON CONFLICT FAIL
 ) WITHOUT ROWID;
+
+CREATE INDEX idx_change_version_id_kind
+ON change (version_id, kind);
+
+CREATE INDEX idx_change_id_version_id
+ON change (id, version_id);
 """
