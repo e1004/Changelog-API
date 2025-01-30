@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from flask import Blueprint, render_template, request
+from realerikrani.project import project_repo
 
 from e1004.changelog_api import service
 
@@ -18,6 +19,7 @@ def index(project_id: UUID):  # noqa: ANN201
         elif "load_previous" in request.form:
             token = request.form.get("previous", None)
     versions_page = service.read_versions(project_id, 5, token)
+    project_name = project_repo.read_project(project_id).name
 
     return render_template(
         "index.html",
@@ -25,6 +27,7 @@ def index(project_id: UUID):  # noqa: ANN201
         previous_token=versions_page.prev_token,
         next_token=versions_page.next_token,
         project_id=project_id,
+        project_name=project_name,
     )
 
 
