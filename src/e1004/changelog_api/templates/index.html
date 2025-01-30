@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
     <head>
         <meta charset="UTF-8">
@@ -8,19 +7,32 @@
         <link rel="stylesheet" href="{{ url_for('ui_controller.static', filename='css/styles.css') }}">
     </head>
     <body>
-        <form method="POST">
-            <input type="hidden" name="previous" value="{{ previous_token}}">
-            <button type="submit" name="load_previous" {% if previous_token is none %}disabled{% endif %}>Load previous</button>
-        </form>
-        <form method="POST">
-            <input type="hidden" name="next" value="{{ next_token}}">
-            <button type="submit" name="load_next" {% if next_token is none %}disabled{% endif %}>Load next</button>
-        </form>
+        <div class="button-container">
+            <form method="POST">
+                <input type="hidden" name="previous" value="{{ previous_token }}">
+                <button type="submit" name="load_previous" {% if previous_token is none %}disabled{% endif %}>Load Previous</button>
+            </form>
+            <form method="POST">
+                <input type="hidden" name="next" value="{{ next_token }}">
+                <button type="submit" name="load_next" {% if next_token is none %}disabled{% endif %}>Load Next</button>
+            </form>
+        </div>
 
-        <div>
+        <div class="version-container">
             {% for v in versions %}
-            <div>
-                <a href="{{project_id}}/{{v.number}}">{{ v.number }}</a>
+            <div class="version-box">
+                <a href="{{ project_id }}/{{ v.number }}">
+                    <div class="version-info">
+                        <span class="version-number">Version {{ v.number }}</span>
+                        <span class="released-at">
+                            {% if v.released_at %}
+                                Released on {{ v.released_at }}
+                            {% else %}
+                                <span class="not-released">Not Released</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </a>
             </div>
             {% endfor %}
         </div>

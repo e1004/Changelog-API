@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
     <head>
         <meta charset="UTF-8">
@@ -8,11 +7,11 @@
         <link rel="stylesheet" href="{{ url_for('ui_controller.static', filename='css/styles.css') }}">
     </head>
     <body>
-        <div>
+        <div class="changes-container">
             {% for c in changes %}
-            <div>
-                <p>{{c.kind}}</p>
-                <p>{{c.body}}</p>
+            <div class="change-item">
+                <p class="change-kind">{{ c.kind }}</p>
+                <p class="change-body">{{ c.body }}</p>
             </div>
             {% endfor %}
         </div>

@@ -1,74 +1,141 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #eaeaea;
+    background: linear-gradient(135deg, #0b1120, #1a202e);
+    color: #e5e7eb;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     flex-direction: column;
+    overflow: hidden;
+}
+
+.button-container {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
 }
 
 button {
-    background: linear-gradient(135deg, #3d5a80, #293241);
-    color: #eaeaea;
+    background: linear-gradient(135deg, #1e293b, #111827);
+    color: #f3f4f6;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
     font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 button:disabled {
-    background: #444;
-    color: #777;
-    opacity: 0.6;
+    background: #374151;
+    color: #9ca3af;
     cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
 }
 
 button:hover:not(:disabled) {
-    background: linear-gradient(135deg, #98c1d9, #3d5a80);
+    background: linear-gradient(135deg, #2d3748, #1e293b);
+    transform: translateY(-3px);
 }
 
-form {
-    margin-bottom: 20px;
+.version-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.version-box {
+    position: relative;
+    background-color: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    width: 240px;
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.version-box:hover {
+    transform: translateY(-6px);
+    background-color: #2c3849;
+}
+
+.version-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.version-number {
+    font-size: 20px;
+    font-weight: bold;
+    color: #81a1c1;
+}
+
+.released-at {
+    font-size: 14px;
+    color: #a1b2c3;
+}
+
+.not-released {
+    color: #d08770;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 a {
     text-decoration: none;
-    color: #98c1d9;
-    font-size: 18px;
+    color: inherit;
     transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #e0fbfc;
+    color: #81a1c1;
 }
 
-div {
-    margin-top: 20px;
+.changes-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    padding: 20px;
+    background: #1a202e;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    max-width: 600px;
+    margin: 20px auto;
 }
 
-div > div {
-    background-color: #293241;
-    border-radius: 10px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
+.change-item {
+    background-color: #1e293b;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-div > div:hover {
-    transform: translateY(-5px);
-    background-color: #3d5a80;
+.change-item:hover {
+    background-color: #2d3748;
+    transform: translateY(-4px);
 }
 
-input[type="hidden"] {
-    display: none;
+.change-kind {
+    font-size: 18px;
+    min-width: 600px;
+    font-weight: bold;
+    color: #81a1c1;
 }
+
+.change-body {
+    font-size: 16px;
+    color: #d1d5db;
+    margin-top: 8px;
+}
+
