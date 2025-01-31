@@ -18,7 +18,7 @@ def index(project_id: UUID):  # noqa: ANN201
             token = request.form.get("next", None)
         elif "load_previous" in request.form:
             token = request.form.get("previous", None)
-    versions_page = service.read_versions(project_id, 5, token)
+    versions_page = service.read_versions(project_id, 4, token)
     project_name = project_repo.read_project(project_id).name
 
     return render_template(

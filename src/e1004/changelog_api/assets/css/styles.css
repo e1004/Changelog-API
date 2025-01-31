@@ -5,17 +5,24 @@ body {
     background: linear-gradient(135deg, #0b1120, #1a202e);
     color: #e5e7eb;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     flex-direction: column;
+    min-height: 100vh;
     overflow: hidden;
+}
+
+.project-container {
+    font-size: 70px;
+    font-family: 'Brush Script MT', cursive;
+    margin: 30px 20px 20px 70px;
+    color: #d1d5db;
 }
 
 .button-container {
     display: flex;
     gap: 16px;
     margin-bottom: 20px;
+    justify-content: center;
+    margin-top: 10px;
 }
 
 button {
@@ -138,4 +145,3 @@ a:hover {
     color: #d1d5db;
     margin-top: 8px;
 }
-
