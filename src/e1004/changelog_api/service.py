@@ -7,6 +7,7 @@ from realerikrani.base64token import decode, encode
 
 from . import repository
 from .error import (
+    ChangeAuthorInvalidError,
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
     VersionNumberInvalidError,
@@ -112,13 +113,22 @@ def validate_body(body: str) -> str:
     raise ChangeBodyInvalidError
 
 
+def validate_author(author: str) -> str:
+    if 1 <= len(author) <= 30:
+        return author
+    raise ChangeAuthorInvalidError
+
+
 def create_change(
-    version_number: str, project_id: UUID, kind: str, body: str
+    version_number: str, project_id: UUID, kind: str, body: str, author: str
 ) -> Change:
     valid_number = validate_version_number(version_number)
     valid_kind = validate_kind(kind)
     valid_body = validate_body(body)
-    return repository.create_change(valid_number, project_id, valid_kind, valid_body)
+    valid_author = validate_author(author)
+    return repository.create_change(
+        valid_number, project_id, valid_kind, valid_body, valid_author
+    )
 
 
 def delete_change(version_number: str, change_id: UUID, project_id: UUID) -> Change:

@@ -79,14 +79,16 @@ def test_it_creates_change(project_1: Project, kind: str):
     version_number = "2.3.5"
     version = create_version(version_number, project_1.id)
     body = "aaaa"
+    author = "author"
 
     # when
-    result = create_change(version_number, project_1.id, kind, body)
+    result = create_change(version_number, project_1.id, kind, body, author)
 
     # then
     assert result.version_id == version.id
     assert result.kind == kind
     assert result.body == body
+    assert result.author == author
     assert isinstance(result.id, UUID)
     assert isinstance(result.version_id, UUID)
 
@@ -95,4 +97,4 @@ def test_it_creates_no_change_for_missing_version():
     # then
     with pytest.raises(VersionNotFoundError):
         # when
-        create_change("2.0.9", uuid4(), "fixed", "body")
+        create_change("2.0.9", uuid4(), "fixed", "body", "author")

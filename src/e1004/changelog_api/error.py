@@ -70,3 +70,9 @@ class ChangeKindInvalidError(Exception):
 class ChangeBodyInvalidError(Exception):
     message: str = "change body is longer that 1000 characters"
     code: str = "VALUE_INVALID"
+
+
+@dataclass(slots=True)
+class ChangeAuthorInvalidError(Exception):
+    message: str = "change author is longer that 30 characters"
+    code: str = "VALUE_INVALID"

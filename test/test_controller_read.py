@@ -88,8 +88,8 @@ def test_it_reads_versions_with_request_params(
 def test_it_reads_changes_for_version(client: FlaskClient, mocker: MockerFixture):
     # given
     valid_number = "1.0.0"
-    change_1 = Change(uuid4(), uuid4(), "body", "fixed")
-    change_2 = Change(uuid4(), uuid4(), "body", "security")
+    change_1 = Change(uuid4(), uuid4(), "body", "fixed", "Bob")
+    change_2 = Change(uuid4(), uuid4(), "body", "security", "Alice")
     read_changes = mocker.patch.object(
         service, "read_changes_for_version", return_value=[change_1, change_2]
     )
@@ -105,6 +105,7 @@ def test_it_reads_changes_for_version(client: FlaskClient, mocker: MockerFixture
         "version_id",
         "kind",
         "body",
+        "author",
     }
     read_changes.assert_called_once_with(valid_number, _KEY.project_id)
 

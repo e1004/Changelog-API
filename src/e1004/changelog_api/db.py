@@ -43,6 +43,10 @@ CREATE TABLE IF NOT EXISTS change (
             "security"
         )
     ),
+    author TEXT NOT NULL CHECK(
+        length("author") <= 30
+        AND length("author") >= 1
+    ),
     FOREIGN KEY(version_id) REFERENCES version(id) ON DELETE CASCADE,
     PRIMARY KEY(id) ON CONFLICT FAIL
 ) WITHOUT ROWID;

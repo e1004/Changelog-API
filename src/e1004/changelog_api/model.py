@@ -26,3 +26,4 @@ class Change:
     version_id: UUID
     body: str
     kind: Literal["added", "changed", "deprecated", "removed", "fixed", "security"]
+    author: str

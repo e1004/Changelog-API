@@ -51,6 +51,7 @@ def to_change(row: sqlite3.Row | None) -> Change:
         version_id=UUID(row["version_id"]),
         kind=row["kind"],
         body=row["body"],
+        author=row["author"],
     )
 
 
@@ -160,19 +161,23 @@ def read_next_versions(
 
 
 def create_change(
-    version_number: str, project_id: UUID, kind: str, body: str
+    version_number: str, project_id: UUID, kind: str, body: str, author: str
 ) -> Change:
-    q = """INSERT INTO change(id, version_id, body, kind)
-    SELECT ?, id, ?, ? FROM version
-    WHERE project_id=? AND major=? AND minor=? AND patch=?
+    q = """INSERT INTO change(id, version_id, body, kind, author)
+    SELECT :change_id, id, :body, :kind, :author FROM version
+    WHERE project_id=:project_id AND major=:major AND minor=:minor AND patch=:patch
     RETURNING *"""
-    args = (
-        str(uuid4()),
-        body,
-        kind,
-        str(project_id),
-        *map(int, version_number.split(".")),
-    )
+    major, minor, patch = map(int, version_number.split("."))
+    args = {
+        "change_id": str(uuid4()),
+        "body": body,
+        "kind": kind,
+        "project_id": str(project_id),
+        "author": author,
+        "major": major,
+        "minor": minor,
+        "patch": patch,
+    }
 
     try:
         return to_change(_query(lambda c: c.execute(q, args).fetchone()))

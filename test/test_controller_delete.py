@@ -111,7 +111,7 @@ def test_it_returns_404_for_missing_version(client: FlaskClient, mocker: MockerF
 def test_it_deletes_change(client: FlaskClient, mocker: MockerFixture):
     # given
     valid_number = "1.0.0"
-    change = Change(uuid4(), uuid4(), "body", "added")
+    change = Change(uuid4(), uuid4(), "body", "added", "Bob")
     delete_change = mocker.patch.object(service, "delete_change", return_value=change)
 
     # when
@@ -125,6 +125,7 @@ def test_it_deletes_change(client: FlaskClient, mocker: MockerFixture):
         "version_id",
         "body",
         "kind",
+        "author",
     }
     delete_change.assert_called_once_with(valid_number, change.id, _KEY.project_id)
 

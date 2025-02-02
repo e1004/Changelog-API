@@ -70,11 +70,11 @@ def test_it_reads_changes_for_version(project_1: Project):
     # given
     version = create_version("1.0.1", project_1.id)
     version_2 = create_version("1.2.1", project_1.id)
-    create_change(version.number, project_1.id, "added", "boody")
-    create_change(version.number, project_1.id, "fixed", "body")
-    create_change(version.number, project_1.id, "changed", "text")
-    create_change(version.number, project_1.id, "security", "body")
-    create_change(version_2.number, project_1.id, "deprecated", "body")
+    create_change(version.number, project_1.id, "added", "boody", "Bob")
+    create_change(version.number, project_1.id, "fixed", "body", "Bob")
+    create_change(version.number, project_1.id, "changed", "text", "Bob")
+    create_change(version.number, project_1.id, "security", "body", "Bob")
+    create_change(version_2.number, project_1.id, "deprecated", "body", "Bob")
 
     # when
     result = read_changes_for_version(version.number, project_1.id)

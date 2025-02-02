@@ -139,7 +139,7 @@ def test_it_moves_change_to_other_version(client: FlaskClient, mocker: MockerFix
     # given
     version_number_1 = "1.0.0"
     version_number_2 = "2.0.0"
-    change = Change(uuid4(), uuid4(), "body", "fixed")
+    change = Change(uuid4(), uuid4(), "body", "fixed", "Bob")
     move_change = mocker.patch.object(
         service, "move_change_to_other_version", return_value=change
     )
@@ -158,6 +158,7 @@ def test_it_moves_change_to_other_version(client: FlaskClient, mocker: MockerFix
         "version_id",
         "kind",
         "body",
+        "author",
     }
     move_change.assert_called_once_with(
         version_number_1, version_number_2, _KEY.project_id, change.id

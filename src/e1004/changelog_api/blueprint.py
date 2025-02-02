@@ -6,6 +6,7 @@ from realerikrani.project import bearer_extractor
 
 from . import service
 from .error import (
+    ChangeAuthorInvalidError,
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
     ChangeNotFoundError,
@@ -107,6 +108,13 @@ def to_body(req: dict) -> str:
         raise Error("body missing", "VALUE_MISSING") from None
 
 
+def to_author(req: dict) -> str:
+    try:
+        return str(req["author"])
+    except KeyError:
+        raise Error("author missing", "VALUE_MISSING") from None
+
+
 @version.route("/<version_number>/changes", methods=["POST"])
 def create_change(version_number: str):
     key = bearer_extractor.protect()
@@ -122,15 +130,23 @@ def create_change(version_number: str):
     except Error as e:
         errors.append(e)
 
+    try:
+        author = to_author(payload)
+    except Error as e:
+        errors.append(e)
+
     if errors:
         raise ErrorGroup("400", errors)
 
     try:
-        change = service.create_change(version_number, key.project_id, kind, body)
+        change = service.create_change(
+            version_number, key.project_id, kind, body, author
+        )
     except (
         ChangeKindInvalidError,
         ChangeBodyInvalidError,
         VersionNumberInvalidError,
+        ChangeAuthorInvalidError,
     ) as e:
         raise ErrorGroup("400", [Error(e.message, e.code)]) from None
     return {"change": change}, 201

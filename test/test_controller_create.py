@@ -11,6 +11,7 @@ from realerikrani.project import PublicKey, bearer_extractor
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
 from e1004.changelog_api.error import (
+    ChangeAuthorInvalidError,
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
     VersionNumberInvalidError,
@@ -86,42 +87,57 @@ def test_it_requires_valid_version_number(client: FlaskClient):
     )
 
 
-def test_create_change_requires_kind_and_body(client: FlaskClient):
+def test_create_change_requires_kind_body_and_author(client: FlaskClient):
     # when
     response = client.post("/versions/1.2.4/changes", json={})
 
     # then
     assert response.status_code == 400
-    assert len(response.json["errors"]) == 2
+    assert len(response.json["errors"]) == 3
     assert response.json["errors"][0]["code"] == "VALUE_MISSING"
     assert response.json["errors"][1]["code"] == "VALUE_MISSING"
     assert "kind" in response.json["errors"][0]["message"]
     assert "body" in response.json["errors"][1]["message"]
+    assert "author" in response.json["errors"][2]["message"]
 
 
 def test_it_creates_change(client: FlaskClient, mocker: MockerFixture):
     # given
-    change = Change(uuid4(), "1.2.3", "aaa", "changed")
+    change = Change(uuid4(), "1.2.3", "aaa", "changed", "Bob")
     create_change = mocker.patch.object(service, "create_change", return_value=change)
 
     # when
     response = client.post(
-        "/versions/1.2.3/changes", json={"kind": change.kind, "body": change.body}
+        "/versions/1.2.3/changes",
+        json={"kind": change.kind, "body": change.body, "author": change.author},
     )
 
     # then
     assert response.status_code == 201
     create_change.assert_called_once_with(
-        "1.2.3", _KEY.project_id, change.kind, change.body
+        "1.2.3", _KEY.project_id, change.kind, change.body, change.author
     )
     assert set(response.json.keys()) == {"change"}
-    assert set(response.json["change"].keys()) == {"version_id", "id", "kind", "body"}
+    assert set(response.json["change"].keys()) == {
+        "version_id",
+        "id",
+        "kind",
+        "body",
+        "author",
+    }
     assert response.json["change"]["kind"] == change.kind
     assert response.json["change"]["body"] == change.body
+    assert response.json["change"]["author"] == change.author
 
 
 @pytest.mark.parametrize(
-    "error", [ChangeKindInvalidError, ChangeBodyInvalidError, VersionNumberInvalidError]
+    "error",
+    [
+        ChangeKindInvalidError,
+        ChangeBodyInvalidError,
+        VersionNumberInvalidError,
+        ChangeAuthorInvalidError,
+    ],
 )
 def test_it_creates_no_change_for_invalid_input(
     client: FlaskClient, mocker: MockerFixture, error: Exception
@@ -131,7 +147,8 @@ def test_it_creates_no_change_for_invalid_input(
 
     # when
     response = client.post(
-        "/versions/1.2.3/changes", json={"kind": "security", "body": "change"}
+        "/versions/1.2.3/changes",
+        json={"kind": "security", "body": "change", "author": "Bob"},
     )
 
     # then

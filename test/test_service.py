@@ -8,6 +8,7 @@ from realerikrani.base64token import encode
 
 from e1004.changelog_api import repository, service
 from e1004.changelog_api.error import (
+    ChangeAuthorInvalidError,
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
     VersionNumberInvalidError,
@@ -260,29 +261,38 @@ def test_it_reads_versions_with_previous_direction(mocker: MockerFixture):
     "kind", ["added", "changed", "fixed", "removed", "deprecated", "security"]
 )
 @pytest.mark.parametrize("body", ["a", "a" * 1000, "aaaaaa"])
-def test_it_creates_change(mocker: MockerFixture, kind: str, body: str):
+@pytest.mark.parametrize("author", ["a", "a" * 30, "aaaaaa"])
+def test_it_creates_change(mocker: MockerFixture, kind: str, body: str, author: str):
     # given
     create_change = mocker.patch.object(repository, "create_change")
     version_number = "1.2.3"
     project_id = uuid4()
 
     # when
-    result = service.create_change(version_number, project_id, kind, body)
+    result = service.create_change(version_number, project_id, kind, body, author)
 
     # then
     assert result == create_change.return_value
-    create_change.assert_called_once_with(version_number, project_id, kind, body)
+    create_change.assert_called_once_with(
+        version_number, project_id, kind, body, author
+    )
 
 
 def test_create_change_raises_error_for_invalid_kind():
     with pytest.raises(ChangeKindInvalidError):
-        service.create_change("1.2.3", uuid4(), "kind", "body")
+        service.create_change("1.2.3", uuid4(), "kind", "body", "Bob")
 
 
 @pytest.mark.parametrize("body", ["", "a" * 1001])
 def test_create_change_raises_error_for_invalid_body(body: str):
     with pytest.raises(ChangeBodyInvalidError):
-        service.create_change("1.2.3", uuid4(), "added", body)
+        service.create_change("1.2.3", uuid4(), "added", body, "Bob")
+
+
+@pytest.mark.parametrize("author", ["", "a" * 31])
+def test_create_change_raises_error_for_invalid_author(author: str):
+    with pytest.raises(ChangeAuthorInvalidError):
+        service.create_change("1.2.3", uuid4(), "added", "body", author)
 
 
 def test_it_deletes_change(mocker: MockerFixture):

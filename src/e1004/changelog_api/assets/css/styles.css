@@ -146,6 +146,21 @@ a:hover {
     margin-top: 8px;
 }
 
+.change-author {
+    font-size: 16px;
+    color: #d1d5db;
+    margin-top: 8px;
+}
+
+.change-author::before {
+    content: "👤";
+    margin-right: 4px;
+}
+
+.author-text {
+    font-style: italic;
+}
+
 .version-number-container {
     font-size: 70px;
     font-family: 'Brush Script MT', cursive;

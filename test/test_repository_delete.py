@@ -63,7 +63,7 @@ def test_it_deletes_change(project_1: Project):
     # given
     version_number = "2.3.5"
     create_version(version_number, project_1.id)
-    change = create_change(version_number, project_1.id, "added", "aaaa")
+    change = create_change(version_number, project_1.id, "added", "aaaa", "Bob")
 
     # when
     result = delete_change(version_number, change.id, project_1.id)
@@ -82,7 +82,7 @@ def test_deleting_change_raises_error_for_released_version(project_1: Project):
     # given
     version_number = "2.3.5"
     create_version(version_number, project_1.id)
-    change = create_change(version_number, project_1.id, "added", "aaaa")
+    change = create_change(version_number, project_1.id, "added", "aaaa", "Bob")
     release_version(version_number, project_1.id, date.today())
 
     with pytest.raises(VersionReleasedError):

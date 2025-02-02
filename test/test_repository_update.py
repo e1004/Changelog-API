@@ -66,7 +66,7 @@ def test_it_moves_change_to_other_version(project_1: Project):
     create_version(version_number_1, project_1.id)
     version_number_2 = "2.3.5"
     target_version = create_version(version_number_2, project_1.id)
-    change = create_change(version_number_1, project_1.id, "added", "body")
+    change = create_change(version_number_1, project_1.id, "added", "body", "Bob")
 
     # when
     result = move_change_to_other_version(
@@ -85,7 +85,7 @@ def test_it_moves_no_change_to_released_version(project_1: Project):
     version_number_2 = "2.3.5"
     create_version(version_number_2, project_1.id)
     release_version(version_number_2, project_1.id, date.today())
-    change = create_change(version_number_1, project_1.id, "added", "body")
+    change = create_change(version_number_1, project_1.id, "added", "body", "Bob")
 
     # then
     with pytest.raises(VersionReleasedError):
@@ -102,7 +102,7 @@ def test_it_moves_no_released_version_change_to_other_version(project_1: Project
     version_number_2 = "2.3.5"
     create_version(version_number_2, project_1.id)
     release_version(version_number_1, project_1.id, date.today())
-    change = create_change(version_number_1, project_1.id, "added", "body")
+    change = create_change(version_number_1, project_1.id, "added", "body", "Bob")
 
     # then
     with pytest.raises(VersionReleasedError):
