@@ -34,4 +34,4 @@ def index(project_id: UUID):  # noqa: ANN201
 @ui.route("/<uuid:project_id>/<version_number>", methods=["GET"])
 def changes(project_id: UUID, version_number: str):  # noqa: ANN201
     c = service.read_changes_for_version(version_number, project_id)
-    return render_template("changes.html", changes=c)
+    return render_template("changes.html", changes=c, version_number=version_number)

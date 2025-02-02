@@ -7,10 +7,13 @@
         <link rel="stylesheet" href="{{ url_for('ui_controller.static', filename='css/styles.css') }}">
     </head>
     <body>
+        <div class="version-number-container">
+            Version {{ version_number }}
+        </div>
         <div class="changes-container">
             {% for c in changes %}
             <div class="change-item">
-                <p class="change-kind">{{ c.kind }}</p>
+                <p class="change-kind">{{ c.kind.capitalize() }}</p>
                 <p class="change-body">{{ c.body }}</p>
             </div>
             {% endfor %}
