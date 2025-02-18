@@ -10,11 +10,16 @@ body {
     overflow: hidden;
 }
 
-.project-container {
+.main-container {
+    padding: 70px;
     font-size: 70px;
-    font-family: 'Brush Script MT', cursive;
-    margin: 30px 20px 20px 70px;
-    color: #d1d5db;
+
+}
+
+.version-and-button-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .button-container {
@@ -55,6 +60,7 @@ button:hover:not(:disabled) {
     flex-direction: column;
     gap: 16px;
     align-items: center;
+    flex: 1;
 }
 
 .version-box {
@@ -163,7 +169,7 @@ a:hover {
 
 .version-number-container {
     font-size: 70px;
-    font-family: 'Brush Script MT', cursive;
+    font-family: 'Inter', sans-serif;
     margin: 30px 20px 20px 70px;
     color: #d1d5db;
 }
