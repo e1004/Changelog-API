@@ -70,8 +70,9 @@ button:hover:not(:disabled) {
     padding: 20px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     width: 240px;
-    text-align: center;
     transition: transform 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
 }
 
 .version-box:hover {
@@ -172,4 +173,38 @@ a:hover {
     font-family: 'Inter', sans-serif;
     margin: 30px 20px 20px 70px;
     color: #d1d5db;
+}
+
+
+.copy-button {
+    background: none;
+    padding: 0;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+.copy-button:hover {
+    background-color: #0056b3;
+}
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+    transition: visibility 0s, opacity 0.5s linear;
+    opacity: 0;
+}
+.toast.show {
+    visibility: visible;
+    opacity: 1;
 }
