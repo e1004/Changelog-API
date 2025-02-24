@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 
 from flask import Blueprint, request
@@ -17,6 +18,8 @@ from .error import (
     VersionReleasedAtError,
     VersionReleasedError,
 )
+
+LOG = logging.getLogger(__package__)
 
 version = Blueprint("version_controller", __name__)
 
@@ -78,6 +81,12 @@ def release_version(version_number: str):
         raise ErrorGroup("400", [Error(br.message, br.code)]) from None
     except VersionReleasedAtError as ra:
         raise ErrorGroup("400", [Error(ra.message, ra.code)]) from None
+    LOG.info(
+        "Version %s in project %s was released by public key %s",
+        version_number,
+        str(key.project_id),
+        key.id,
+    )
     return {"version": version}
 
 
