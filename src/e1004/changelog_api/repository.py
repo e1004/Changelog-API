@@ -29,7 +29,7 @@ _query = partial(
 def to_version(row: sqlite3.Row | None) -> Version:
     if row is None:
         raise VersionNotFoundError
-    number = f'{row["major"]}.{row["minor"]}.{row["patch"]}'
+    number = f"{row['major']}.{row['minor']}.{row['patch']}"
     return Version(
         id=UUID(row["id"]),
         number=number,
