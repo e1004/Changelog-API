@@ -31,12 +31,12 @@ function showToast(message) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const copyButton = document.getElementById('copyButton');
+    const copyButtons = document.querySelectorAll('.copy-button');
 
-    if (copyButton) {
-        copyButton.addEventListener('click', function () {
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
             const url = this.getAttribute('data-url');
             copyToClipboard(url);
         });
-    }
+    });
 });

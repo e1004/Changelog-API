@@ -25,11 +25,13 @@ def index(project_id: UUID):  # noqa: ANN201
     styles_location = url_for("ui_controller.static", filename="css/styles.css")
     script_location = url_for("ui_controller.static", filename="script.js")
     link_location = url_for("ui_controller.static", filename="icons/link.svg")
+    version_location = f"{request.url_root }{ project_id }"
     if app_prefix_enabled:
-        prefix = "app"
+        prefix = "/app"
         styles_location = f"{prefix}{styles_location}"
         script_location = f"{prefix}{script_location}"
         link_location = f"{prefix}{link_location}"
+        version_location = f"{prefix}{version_location}"
 
     return render_template(
         "index.html",
@@ -41,6 +43,7 @@ def index(project_id: UUID):  # noqa: ANN201
         styles_location=styles_location,
         script_location=script_location,
         link_location=link_location,
+        version_location=version_location,
     )
 
 
@@ -51,7 +54,7 @@ def changes(project_id: UUID, version_number: str):  # noqa: ANN201
     app_prefix_enabled = current_app.config["APP_PREFIX_ENABLED"]
     styles_location = url_for("ui_controller.static", filename="css/styles.css")
     if app_prefix_enabled:
-        styles_location = "app" + styles_location
+        styles_location = "/app" + styles_location
 
     return render_template(
         "changes.html",
