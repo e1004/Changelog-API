@@ -15,3 +15,14 @@ function showToast(message) {
         toast.classList.remove('show');
     }, 2000);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const copyButton = document.getElementById('copyButton');
+
+    if (copyButton) {
+        copyButton.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            copyToClipboard(url);
+        });
+    }
+});

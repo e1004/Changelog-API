@@ -37,7 +37,7 @@
                             </span>
                         </div>
                     </a>
-                    <button class="copy-button" onclick="copyToClipboard('{{ request.url_root }}{{ project_id }}/{{ v.number }}')">
+                    <button class="copy-button" id="copyButton" data-url="{{ request.url_root }}{{ project_id }}/{{ v.number }}">
                         <img src="{{ url_for('ui_controller.static', filename='icons/link.svg') }}" alt="link" width="24" height="24" />
                       </button>
                 </div>
