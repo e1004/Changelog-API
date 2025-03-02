@@ -8,7 +8,7 @@ from e1004.changelog_api.blueprint import version
 from e1004.changelog_api.ui import ui
 
 
-def create() -> Flask:
+def create(*, app_prefix_enabled: bool = False) -> Flask:
     app = register_project(Flask("e1004.changelog_api"))
     app.register_blueprint(version, url_prefix="/versions")
     app.register_blueprint(ui, url_prefix="/")
@@ -17,4 +17,5 @@ def create() -> Flask:
         if isinstance(obj, datetime | date)
         else DefaultJSONProvider.default(obj)
     )
+    app.config["APP_PREFIX_ENABLED"] = app_prefix_enabled
     return app

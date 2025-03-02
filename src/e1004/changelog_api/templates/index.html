@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Changelog API</title>
-    <link rel="stylesheet" href="{{ url_for('ui_controller.static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ styles_location }}">
 </head>
 <body>
     <div class="main-container">
@@ -38,7 +38,7 @@
                         </div>
                     </a>
                     <button class="copy-button" id="copyButton" data-url="{{ request.url_root }}{{ project_id }}/{{ v.number }}">
-                        <img src="{{ url_for('ui_controller.static', filename='icons/link.svg') }}" alt="link" width="24" height="24" />
+                        <img src="{{ link_location }}" alt="link" width="24" height="24" />
                       </button>
                 </div>
                 {% endfor %}
@@ -47,6 +47,6 @@
     </div>
 
     <div id="toast" class="toast">URL copied to clipboard!</div>
-    <script src="{{ url_for('ui_controller.static', filename='script.js') }}"></script>
+    <script src="{{ script_location }}"></script>
 </body>
 </html>
