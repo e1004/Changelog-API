@@ -7,12 +7,12 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .main-container {
     padding: 70px;
-    font-size: 70px;
+    font-size: 50px;
 
 }
 
