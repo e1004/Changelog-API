@@ -17,6 +17,7 @@ from .error import (
     VersionNumberInvalidError,
     VersionReleasedAtError,
     VersionReleasedError,
+    VersionsReadingTokenInvalidError,
 )
 
 LOG = logging.getLogger(__package__)
@@ -95,7 +96,10 @@ def read_versions():
     key = bearer_extractor.protect()
     page_size = request.args.get("page_size", type=int, default=5)
     page_token = request.args.get("page_token", default=None)
-    version_page = service.read_versions(key.project_id, page_size, page_token)
+    try:
+        version_page = service.read_versions(key.project_id, page_size, page_token)
+    except VersionsReadingTokenInvalidError as e:
+        raise ErrorGroup("400", [Error(e.message, e.code)]) from None
     return {
         "versions": version_page.versions,
         "previous_token": version_page.prev_token,

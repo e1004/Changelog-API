@@ -25,7 +25,7 @@ def index(project_id: UUID):  # noqa: ANN201
     styles_location = url_for("ui_controller.static", filename="css/styles.css")
     script_location = url_for("ui_controller.static", filename="script.js")
     link_location = url_for("ui_controller.static", filename="icons/link.svg")
-    version_location = f"{request.url_root }{ project_id }"
+    version_location = f"{request.url_root}{project_id}"
     if app_prefix_enabled:
         prefix = "/app"
         styles_location = f"{prefix}{styles_location}"

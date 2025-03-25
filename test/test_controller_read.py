@@ -10,7 +10,11 @@ from realerikrani.project import PublicKey, bearer_extractor
 
 from e1004.changelog_api import service
 from e1004.changelog_api.app import create
-from e1004.changelog_api.error import VersionNotFoundError, VersionNumberInvalidError
+from e1004.changelog_api.error import (
+    VersionNotFoundError,
+    VersionNumberInvalidError,
+    VersionsReadingTokenInvalidError,
+)
 from e1004.changelog_api.model import Change, Version, VersionsPage
 
 _KEY = Mock(autospec=PublicKey)
@@ -83,6 +87,21 @@ def test_it_reads_versions_with_request_params(
     assert response.json["previous_token"] is None
     assert response.json["next_token"] is None
     read_versions.assert_called_once_with(_KEY.project_id, page_size, token)
+
+
+def test_it_returns_error_for_invalid_versions_reading(
+    client: FlaskClient, mocker: MockerFixture
+):
+    # given
+    mocker.patch.object(
+        service, "read_versions", side_effect=VersionsReadingTokenInvalidError
+    )
+
+    # when
+    response = client.get("/versions")
+
+    # then
+    assert response.status_code == 400
 
 
 def test_it_reads_changes_for_version(client: FlaskClient, mocker: MockerFixture):
