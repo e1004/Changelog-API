@@ -160,6 +160,7 @@ def create_change(version_number: str):
         ChangeBodyInvalidError,
         VersionNumberInvalidError,
         ChangeAuthorInvalidError,
+        VersionNotFoundError,
     ) as e:
         raise ErrorGroup("400", [Error(e.message, e.code)]) from None
     return {"change": change}, 201

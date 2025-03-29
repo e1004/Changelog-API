@@ -14,6 +14,7 @@ from e1004.changelog_api.error import (
     ChangeAuthorInvalidError,
     ChangeBodyInvalidError,
     ChangeKindInvalidError,
+    VersionNotFoundError,
     VersionNumberInvalidError,
 )
 from e1004.changelog_api.model import Change, Version
@@ -137,6 +138,7 @@ def test_it_creates_change(client: FlaskClient, mocker: MockerFixture):
         ChangeBodyInvalidError,
         VersionNumberInvalidError,
         ChangeAuthorInvalidError,
+        VersionNotFoundError,
     ],
 )
 def test_it_creates_no_change_for_invalid_input(
