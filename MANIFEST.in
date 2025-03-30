@@ -1,4 +1,4 @@
 recursive-include src/e1004/changelog_api/templates *
 recursive-include src/e1004/changelog_api/assets *
 exclude test/*
-include README.md LICENSE
+include README.md LICENSE LICENSE-BSD-3-Clause-flask
