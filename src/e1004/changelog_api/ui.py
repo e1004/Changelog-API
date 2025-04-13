@@ -31,7 +31,7 @@ def index(project_id: UUID):  # noqa: ANN201
         styles_location = f"{prefix}{styles_location}"
         script_location = f"{prefix}{script_location}"
         link_location = f"{prefix}{link_location}"
-        version_location = f"{prefix}{version_location}"
+        version_location = f"{request.url_root}{prefix}{project_id}"
 
     return render_template(
         "index.html",
