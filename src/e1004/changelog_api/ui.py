@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from flask import Blueprint, current_app, render_template, request, url_for
-from realerikrani.project import project_repo
+from realerikrani.project import ProjectNotFoundError, project_repo
 
 from e1004.changelog_api import service
 
@@ -19,7 +19,10 @@ def index(project_id: UUID):  # noqa: ANN201
         elif "load_previous" in request.form:
             token = request.form.get("previous", None)
     versions_page = service.read_versions(project_id, 4, token)
-    project_name = project_repo.read_project(project_id).name
+    try:
+        project_name = project_repo.read_project(project_id).name
+    except ProjectNotFoundError:
+        return render_template("404.html"), 404
 
     app_prefix_enabled = current_app.config["APP_PREFIX_ENABLED"]
     styles_location = url_for("ui_controller.static", filename="css/styles.css")

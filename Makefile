@@ -1,6 +1,7 @@
 .PHONY: pin
 pin:
-	python3 -m pip install --only-binary :all: --upgrade pip-tools pip wheel setuptools
+	# https://github.com/jazzband/pip-tools/issues/2176
+	python3 -m pip install --only-binary :all: --upgrade pip-tools 'pip < 25.1' wheel setuptools
 	python3 -m piptools compile --strip-extras --quiet --generate-hashes --upgrade requirements/prod.in -o requirements/prod.txt
 	python3 -m piptools compile --strip-extras --quiet --generate-hashes --upgrade requirements/dev.in -o requirements/dev.txt
 
